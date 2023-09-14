@@ -8,10 +8,9 @@ import (
 )
 
 func main() {
-	flamingo.App(
-		[]dingo.module{
+	flamingo.App([]dingo.Module{
 			new(requestlogger.Module),
-			new(api.Module)
+			new(api.Module),
 		},
 	)
 }

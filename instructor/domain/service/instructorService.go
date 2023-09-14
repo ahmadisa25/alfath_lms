@@ -5,5 +5,5 @@ import (
 )
 
 type InstructorServiceInterface interface {
-	GetInstructor(id int) (entity.Instructor, error)
+	GetInstructor(id string) (entity.Instructor, error)
 }

@@ -1,9 +1,11 @@
 package interfaces
 
 import (
-	"context"
 	"alfath_lms/instructor/domain/entity"
 	"alfath_lms/instructor/domain/service"
+	"context"
+	"fmt"
+
 	"flamingo.me/flamingo/v3/framework/web"
 )
 
@@ -27,17 +29,16 @@ func (instructorController *InstructorController) Inject(
 }
 
 func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
-	instructorID, err := req.Query1(1)
+	instructorID, err := req.Query1("1")
 	PrintError(err)
 
 	instructor, err := instructorController.instructorService.GetInstructor(instructorID)
 	PrintError(err)
 
-	return instructorController.responder.data(GetInstructorResponse{
-		Instructor:instructor
+	return instructorController.responder.Data(GetInstructorResponse{
+		Instructor: instructor,
 	})
 }
-
 
 func PrintError(err error) error {
 	if err != nil {

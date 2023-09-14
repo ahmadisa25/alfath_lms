@@ -10,7 +10,8 @@ import (
 
 type InstructorService struct{}
 
-func (instructorSvc InstructorService) GetOrder(id int) (entity.Instructor, error) {
+func (instructorSvc InstructorService) GetInstructor(id string) (entity.Instructor, error) {
+	fmt.Println("yuhu")
 	var instructor entity.Instructor
 	response, err := http.Get(fmt.Sprintf("instructor-service/instructors/%d", id))
 	PrintError(err)
