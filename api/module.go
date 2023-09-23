@@ -3,7 +3,7 @@ package api
 import (
 	"alfath_lms/instructor/domain/service"
 	"alfath_lms/instructor/infrastructure"
-
+	"alfath_lms/db"	
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3/framework/web"
 )
@@ -17,4 +17,10 @@ func (module *Module) Configure(injector *dingo.Injector) {
 	} else {*/
 	injector.Bind(new(service.InstructorServiceInterface)).To(infrastructure.InstructorService{})
 	//}
+}
+
+func (module *Module) Depends() []dingo.Module {
+	return []dingo.Module{
+		new(db.Module),
+	}
 }
