@@ -6,6 +6,7 @@ import (
 	"alfath_lms/api/definitions"
 	"context"
 	"fmt"
+	"strings"
 	"strconv"
 	"flamingo.me/flamingo/v3/framework/web"
 )
@@ -31,8 +32,11 @@ func (instructorController *InstructorController) Inject(
 }
 
 func (instructorController *InstructorController) Create(ctx context.Context, req *web.Request) web.Result {
-
-}
+	if req.Params["Name"] == "" {
+		return instructorController.responder.HTTP(400, strings.NewReader("Please provide instructor name"))
+	}
+	
+}	
 
 func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
