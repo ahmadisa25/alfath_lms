@@ -30,6 +30,10 @@ func (instructorController *InstructorController) Inject(
 	instructorController.instructorService = instructorService
 }
 
+func (instructorController *InstructorController) Create(ctx context.Context, req *web.Request) web.Result {
+
+}
+
 func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
