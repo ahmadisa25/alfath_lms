@@ -7,9 +7,9 @@ import (
 type Instructor struct {
 	gorm.Model
 	ID          int
-	Name        string
-	Email       string
-	MobilePhone string
+	Name        string	`validate:"required"`
+	Email       string	`validate:"required,email"`
+	MobilePhone string	`validate:"required"`
 }
   
 // TableName overrides the table name used by User to `profiles`

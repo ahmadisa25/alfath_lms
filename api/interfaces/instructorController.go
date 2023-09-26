@@ -32,10 +32,17 @@ func (instructorController *InstructorController) Inject(
 }
 
 func (instructorController *InstructorController) Create(ctx context.Context, req *web.Request) web.Result {
-	if req.Params["Name"] == "" {
-		return instructorController.responder.HTTP(400, strings.NewReader("Please provide instructor name"))
+	if len(req.Params) == 0{
+		return instructorController.responder.HTTP(400, strings.NewReader("Please provide a valid request body"))
 	}
-	
+
+	instructor := &entity.Instructor{
+		Name: req.Params["Name"],
+		Email: req.Params["Email"],
+		MobilePhone: req.Params["MobilePhone"],
+	}
+
+	err := validate.Struct(instructor)
 }	
 
 func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
