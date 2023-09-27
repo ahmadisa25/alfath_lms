@@ -4,6 +4,7 @@ import (
 	"alfath_lms/instructor/domain/service"
 	"alfath_lms/instructor/infrastructure"
 	"alfath_lms/db"	
+	"alfath_lms/validator"	
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3/framework/web"
 )
@@ -22,5 +23,6 @@ func (module *Module) Configure(injector *dingo.Injector) {
 func (module *Module) Depends() []dingo.Module {
 	return []dingo.Module{
 		new(db.Module),
+		new(validator.Module),
 	}
 }

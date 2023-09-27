@@ -16,4 +16,7 @@ func (routes *Routes) Inject(instructorController *interfaces.InstructorControll
 func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/instructor/:id", "instructor")
 	registry.HandleGet("instructor", routes.instructorController.Get)
+
+	registry.Route("/instructor/", "instructor")
+	registry.HandlePost("instructor", routes.instructorController.Create)
 }
