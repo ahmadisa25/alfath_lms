@@ -5,6 +5,7 @@ import (
 	"alfath_lms/instructor/domain/entity"
 	"alfath_lms/instructor/domain/service"
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -66,7 +67,7 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		MobilePhone: mobilePhone[0],
 		CreatedAt:   time.Now(),
 	}
-	fmt.Println(*instructor)
+
 	validateError := instructorController.validate.Struct(instructor)
 	if validateError != nil {
 		return instructorController.responder.HTTP(400, strings.NewReader(validateError.Error()))
@@ -77,7 +78,12 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		return instructorController.responder.HTTP(500, strings.NewReader("Failed to create instructor. Please contract support or try again"))
 	}
 
-	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader("Instructor created successfully"))
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
 
 }
 

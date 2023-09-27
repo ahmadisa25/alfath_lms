@@ -21,7 +21,6 @@ func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instru
 	if result.Error != nil {
 		return definitions.GenericCreationMessage{}, result.Error
 	}
-
 	return definitions.GenericCreationMessage{
 		Status:     201,
 		InstanceID: instructor.ID,
