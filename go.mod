@@ -5,6 +5,7 @@ go 1.20
 require (
 	flamingo.me/dingo v0.2.10
 	flamingo.me/flamingo/v3 v3.7.0
+	flamingo.me/form v1.1.1
 	github.com/go-playground/validator/v10 v10.15.4
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4
@@ -62,5 +63,6 @@ require (
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/api v0.84.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

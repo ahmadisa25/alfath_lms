@@ -1,28 +1,29 @@
 package infrastructure
 
 import (
+	"alfath_lms/api/definitions"
 	"alfath_lms/instructor/domain/entity"
 	"fmt"
+
 	"gorm.io/gorm"
-	"alfath_lms/api/definitions"
 )
 
-type InstructorService struct{
+type InstructorService struct {
 	db *gorm.DB
 }
 
-func (instructorSvc *InstructorService) Inject(db *gorm.DB){
+func (instructorSvc *InstructorService) Inject(db *gorm.DB) {
 	instructorSvc.db = db
 }
 
-func (instructorSvc InstructorService) 	CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error){
+func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {
 	result := instructorSvc.db.Create(&instructor)
-	if result.Error != nil{
+	if result.Error != nil {
 		return definitions.GenericCreationMessage{}, result.Error
-	} 
+	}
 
 	return definitions.GenericCreationMessage{
-		Status: 201,
+		Status:     201,
 		InstanceID: instructor.ID,
 	}, nil
 }
