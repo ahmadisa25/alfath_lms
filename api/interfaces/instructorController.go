@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"alfath_lms/api/definitions"
+	"alfath_lms/api/funcs"
 	"alfath_lms/instructor/domain/entity"
 	"alfath_lms/instructor/domain/service"
 	"context"
@@ -46,25 +47,10 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 	form := req.Request().Form
 
-	name, nameOk := form["Name"]
-	if !nameOk {
-		return instructorController.responder.HTTP(400, strings.NewReader("You must put in instructor name"))
-	}
-
-	email, emailOk := form["Email"]
-	if !emailOk {
-		return instructorController.responder.HTTP(400, strings.NewReader("You must put in instructor email"))
-	}
-
-	mobilePhone, mobilePhoneOk := form["MobilePhone"]
-	if !mobilePhoneOk {
-		return instructorController.responder.HTTP(400, strings.NewReader("You must put in instructor mobile phone"))
-	}
-
 	instructor := &entity.Instructor{
-		Name:        name[0],
-		Email:       email[0],
-		MobilePhone: mobilePhone[0],
+		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
+		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
+		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
 		CreatedAt:   time.Now(),
 	}
 
