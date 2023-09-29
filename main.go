@@ -2,6 +2,7 @@ package main
 
 import (
 	"alfath_lms/api"
+
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3"
 	"flamingo.me/flamingo/v3/core/requestlogger"
@@ -9,8 +10,8 @@ import (
 
 func main() {
 	flamingo.App([]dingo.Module{
-			new(requestlogger.Module),
-			new(api.Module),
-		},
+		new(requestlogger.Module),
+		new(api.Module),
+	},
 	)
 }

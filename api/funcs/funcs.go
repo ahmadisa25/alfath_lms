@@ -1,9 +1,8 @@
 package funcs
 
-import "fmt"
-
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {
 	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
+	//used form Flamingo Form Requests (r.Request().Form)
 	key, keyOk := form[mapKey]
 	if !keyOk {
 		if dataType == "string" {
@@ -16,6 +15,6 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 
 		return nil
 	}
-	fmt.Println(key)
+	//test15
 	return key[0]
 }
