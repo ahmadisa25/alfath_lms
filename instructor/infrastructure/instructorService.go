@@ -17,8 +17,10 @@ func (instructorSvc *InstructorService) Inject(db *gorm.DB) {
 }
 
 func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {
+	fmt.Println("yaahaa")
 	result := instructorSvc.db.Create(&instructor)
 	if result.Error != nil {
+		fmt.Println("masuk")
 		return definitions.GenericCreationMessage{}, result.Error
 	}
 	return definitions.GenericCreationMessage{

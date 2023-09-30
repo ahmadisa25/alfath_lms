@@ -12,7 +12,7 @@ type Instructor struct {
 	Name        string    `gorm:"primaryKey;" validate:"required" json:"Name,omitempty"`
 	Email       string    `gorm:"unique" validate:"required,email" json:"Email,omitempty"`
 	MobilePhone string    `gorm:"unique" validate:"required,numeric" json:"MobilePhone,omitempty"`
-	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP()" json:"CreatedAt,omitempty"`
+	CreatedAt   time.Time `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt   time.Time `json:"UpdatedAt,omitempty"`
 }
 

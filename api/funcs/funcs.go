@@ -1,5 +1,23 @@
 package funcs
 
+import (
+	"alfath_lms/api/definitions"
+	"encoding/json"
+)
+
+func ErrorPackaging(err string, status int) (string, error) {
+	res, resErr := json.Marshal(definitions.GenericAPIMessage{
+		Status:  status,
+		Message: err,
+	})
+
+	if resErr != nil {
+		return "", resErr
+	}
+
+	return string(res), nil
+}
+
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {
 	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
 	//used form Flamingo Form Requests (r.Request().Form)

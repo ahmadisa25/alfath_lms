@@ -61,7 +61,12 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 	result, err := instructorController.instructorService.CreateInstructor(*instructor)
 	if err != nil {
-		return instructorController.responder.HTTP(500, strings.NewReader("Failed to create instructor. Please contract support or try again"))
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
+		}
+		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
 	}
 
 	res, resErr := json.Marshal(result)
