@@ -3,6 +3,7 @@ package interfaces
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/funcs"
+	"alfath_lms/deps/validator"
 	"alfath_lms/instructor/domain/entity"
 	"alfath_lms/instructor/domain/service"
 	"context"
@@ -13,13 +14,12 @@ import (
 	"time"
 
 	"flamingo.me/flamingo/v3/framework/web"
-	"github.com/go-playground/validator/v10"
 )
 
 type (
 	InstructorController struct {
 		responder         *web.Responder
-		validate          *validator.Validate
+		validator         *validator.CustomValidator
 		instructorService service.InstructorServiceInterface
 	}
 
@@ -31,11 +31,11 @@ type (
 
 func (instructorController *InstructorController) Inject(
 	responder *web.Responder,
-	validate *validator.Validate,
+	validator *validator.CustomValidator,
 	instructorService service.InstructorServiceInterface,
 ) {
 	instructorController.responder = responder
-	instructorController.validate = validate
+	instructorController.validator = validator
 	instructorController.instructorService = instructorService
 }
 
@@ -54,9 +54,15 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		CreatedAt:   time.Now(),
 	}
 
-	validateError := instructorController.validate.Struct(instructor)
+	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
+	validateError := instructorController.validator.Validate.Struct(instructor)
 	if validateError != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(validateError.Error()))
+		errorResponse := funcs.ErrorPackagingForMaps(instructorController.validator.TranslateError(validateError))
+		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(400, strings.NewReader(errorResponse))
 	}
 
 	result, err := instructorController.instructorService.CreateInstructor(*instructor)
@@ -64,7 +70,7 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
 		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
 	}

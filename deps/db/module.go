@@ -1,4 +1,4 @@
-package validator
+package db
 
 import (
 	"alfath_lms/instructor/domain/entity"
