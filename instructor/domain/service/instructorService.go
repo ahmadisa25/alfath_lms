@@ -6,6 +6,7 @@ import (
 )
 
 type InstructorServiceInterface interface {
-	GetInstructor(id string) (entity.Instructor, error)
+	GetInstructor(id int) (entity.Instructor, error)
 	CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error)
+	UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericCreationMessage, error)
 }

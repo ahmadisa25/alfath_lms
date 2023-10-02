@@ -50,3 +50,22 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 	//test15
 	return key[0]
 }
+
+func ValidateOrOverwriteStringFormKeys(mapKey string, form map[string][]string, dataType string, input interface{}) interface{} {
+	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
+	//used form Flamingo Form Requests (r.Request().Form)
+
+	if _, isNotStruct := input.(struct{}); isNotStruct{
+		return nil
+	} else {
+		key, keyOk := form[mapKey]
+		if !keyOk {
+			//ganti supaya ngakses fieldnya si input
+			return ""
+		}
+		//test15
+		return key[0]
+	}
+	
+	
+}

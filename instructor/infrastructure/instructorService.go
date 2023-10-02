@@ -40,7 +40,7 @@ func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instru
 	}, nil
 }
 
-func (instructorSvc InstructorService) GetInstructor(id string) (entity.Instructor, error) {
+func (instructorSvc InstructorService) GetInstructor(id int) (entity.Instructor, error) {
 	var instructor entity.Instructor
 
 	result := &instructor
