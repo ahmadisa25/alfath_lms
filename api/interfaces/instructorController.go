@@ -84,6 +84,45 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 }
 
+func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
+	if req.Params["id"] == "" {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an instructor!",
+		})
+	}
+
+	intID, err := strconv.Atoi(req.Params["id"])
+	//PrintError(err)
+
+	if intID <= 0 {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an instructor!",
+		})
+	}
+
+	instructor, err := instructorController.instructorService.GetInstructor(intID)
+	if err != nil {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		})
+	}
+
+	if instructor.ID <= 0 {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  404,
+			Message: "Instructor Not Found!",
+		})
+	}
+
+	return instructorController.responder.Data(GetInstructorResponse{
+		Status: 200,
+		Data:   instructor,
+	})
+}
+
 func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
@@ -125,23 +164,29 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	form := req.Request().Form
 
 	instructorData := &entity.Instructor{
-		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
-		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
-		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
+		Name:        funcs.ValidateOrOverwriteStringFormKeys("Name", form, "string", instructor).(string),
+		Email:       funcs.ValidateOrOverwriteStringFormKeys("Email", form, "string", instructor).(string),
+		MobilePhone: funcs.ValidateOrOverwriteStringFormKeys("MobilePhone", form, "string", instructor).(string),
 		CreatedAt:   time.Now(),
 	}
 
-	validateError := instructorController.validate.Struct(instructorData)
+	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
+	validateError := instructorController.validator.Validate.Struct(instructorData)
 	if validateError != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(validateError.Error()))
+		errorResponse := funcs.ErrorPackagingForMaps(instructorController.validator.TranslateError(validateError))
+		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(400, strings.NewReader(errorResponse))
 	}
 
-	result, err := instructorController.instructorService.CreateInstructor(*instructorData)
+	result, err := instructorController.instructorService.UpdateInstructor(intID, *instructorData)
 	if err != nil {
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
 		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
 	}
@@ -152,50 +197,6 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	}
 
 	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
-
-	/*return instructorController.responder.Data(GetInstructorResponse{
-		Status: 200,
-		Data:   instructor,
-	})*/
-}
-
-func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
-	if req.Params["id"] == "" {
-		return instructorController.responder.Data(definitions.GenericAPIMessage{
-			Status:  400,
-			Message: "Please select an instructor!",
-		})
-	}
-
-	intID, err := strconv.Atoi(req.Params["id"])
-	//PrintError(err)
-
-	if intID <= 0 {
-		return instructorController.responder.Data(definitions.GenericAPIMessage{
-			Status:  400,
-			Message: "Please select an instructor!",
-		})
-	}
-
-	instructor, err := instructorController.instructorService.GetInstructor(intID)
-	if err != nil {
-		return instructorController.responder.Data(definitions.GenericAPIMessage{
-			Status:  500,
-			Message: "We cannot process your request. Please try again or contact support!",
-		})
-	}
-
-	if instructor.ID <= 0 {
-		return instructorController.responder.Data(definitions.GenericAPIMessage{
-			Status:  404,
-			Message: "Instructor Not Found!",
-		})
-	}
-
-	return instructorController.responder.Data(GetInstructorResponse{
-		Status: 200,
-		Data:   instructor,
-	})
 }
 
 func PrintError(err error) error {
