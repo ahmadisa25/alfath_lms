@@ -118,49 +118,14 @@ func (instructorController *InstructorController) Get(ctx context.Context, req *
 		})
 	}
 
-	formError := req.Request().ParseForm()
-	if formError != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(formError.Error()))
-	}
-
-	form := req.Request().Form
-
-	instructorData := &entity.Instructor{
-		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
-		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
-		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
-		CreatedAt:   time.Now(),
-	}
-
-	validateError := instructorController.customValidator.Validate.Struct(instructorData)
-	if validateError != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(validateError.Error()))
-	}
-
-	result, err := instructorController.instructorService.CreateInstructor(*instructorData)
-	if err != nil {
-		fmt.Println(err)
-		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
-		if packError != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
-		}
-		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
-	}
-
-	res, resErr := json.Marshal(result)
-	if resErr != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
-	}
-
-	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
-
-	/*return instructorController.responder.Data(GetInstructorResponse{
+	return instructorController.responder.Data(GetInstructorResponse{
 		Status: 200,
 		Data:   instructor,
 	})
 }
 
 func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
+	fmt.Println("masuk")
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
@@ -208,9 +173,9 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	}
 
 	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
-	validateError := instructorController.validator.Validate.Struct(instructorData)
+	validateError := instructorController.customValidator.Validate.Struct(instructorData)
 	if validateError != nil {
-		errorResponse := funcs.ErrorPackagingForMaps(instructorController.validator.TranslateError(validateError))
+		errorResponse := funcs.ErrorPackagingForMaps(instructorController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
 			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))

@@ -41,7 +41,8 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instr
 }
 
 func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericCreationMessage, error){
-	result := instructorSvc.db.Save(&instructor)
+	var instructorTemp entity.Instructor
+	result := instructorSvc.db.Model(instructorTemp).Where("id=?", id).Updates(instructor)
 	if result.Error != nil {
 		return definitions.GenericCreationMessage{}, result.Error
 	}
