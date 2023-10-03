@@ -3,8 +3,8 @@ package api
 import (
 	"alfath_lms/instructor/domain/service"
 	"alfath_lms/instructor/infrastructure"
-	"alfath_lms/db"	
-	"alfath_lms/validator"	
+	"alfath_lms/api/deps/db"	
+	"alfath_lms/api/deps/validator"	
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3/framework/web"
 )

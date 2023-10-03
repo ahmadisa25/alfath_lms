@@ -17,7 +17,7 @@ func (instructorSvc *InstructorService) Inject(db *gorm.DB) {
 	instructorSvc.db = db
 }
 
-func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {
+func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {
 
 	var instructorTemp entity.Instructor
 	instructorSvc.db.Where("Email = ?", instructor.Email).First(&instructorTemp)
@@ -40,7 +40,18 @@ func (instructorSvc InstructorService) CreateInstructor(instructor entity.Instru
 	}, nil
 }
 
-func (instructorSvc InstructorService) GetInstructor(id int) (entity.Instructor, error) {
+func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericCreationMessage, error){
+	result := instructorSvc.db.Save(&instructor)
+	if result.Error != nil {
+		return definitions.GenericCreationMessage{}, result.Error
+	}
+	return definitions.GenericCreationMessage{
+		Status:     200,
+		InstanceID: instructor.ID,
+	}, nil
+}
+
+func (instructorSvc *InstructorService) GetInstructor(id int) (entity.Instructor, error) {
 	var instructor entity.Instructor
 
 	result := &instructor

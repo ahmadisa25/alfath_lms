@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_NAME="$1"
+APP_NAME="alfath_lms"
 restart(){
     echo "hot reloading"
     pkill -9 $APP_NAME
