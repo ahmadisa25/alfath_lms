@@ -6,6 +6,20 @@ import (
 	"reflect"
 )
 
+func ErrorPackagingForMaps(errs []error) string {
+	errorStrings := ""
+
+	for i, err := range errs {
+		errorStrings += err.Error()
+		if i < len(errs)-1 {
+			errorStrings += ","
+		}
+	}
+
+	return errorStrings
+
+}
+
 func ErrorPackaging(err string, status int) (string, error) {
 	res, resErr := json.Marshal(definitions.GenericAPIMessage{
 		Status:  status,

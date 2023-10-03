@@ -3,9 +3,9 @@ package interfaces
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/funcs"
+	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/instructor/domain/entity"
 	"alfath_lms/api/instructor/domain/service"
-	"alfath_lms/deps/validator"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,7 +19,7 @@ import (
 type (
 	InstructorController struct {
 		responder         *web.Responder
-		validator         *validator.CustomValidator
+		customValidator *validator.CustomValidator
 		instructorService service.InstructorServiceInterface
 	}
 
@@ -31,11 +31,11 @@ type (
 
 func (instructorController *InstructorController) Inject(
 	responder *web.Responder,
-	validator *validator.CustomValidator,
+	customValidator *validator.CustomValidator,
 	instructorService service.InstructorServiceInterface,
 ) {
 	instructorController.responder = responder
-	instructorController.validator = validator
+	instructorController.customValidator = customValidator
 	instructorController.instructorService = instructorService
 }
 
@@ -55,9 +55,10 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 	}
 
 	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
-	validateError := instructorController.validator.Validate.Struct(instructor)
+	validateError := instructorController.customValidator.Validate.Struct(instructor)
 	if validateError != nil {
-		errorResponse := funcs.ErrorPackagingForMaps(instructorController.validator.TranslateError(validateError))
+		errorResponse := funcs.ErrorPackagingForMaps(instructorController.customValidator.TranslateError(validateError))
+		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
 			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
@@ -117,7 +118,43 @@ func (instructorController *InstructorController) Get(ctx context.Context, req *
 		})
 	}
 
-	return instructorController.responder.Data(GetInstructorResponse{
+	formError := req.Request().ParseForm()
+	if formError != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(formError.Error()))
+	}
+
+	form := req.Request().Form
+
+	instructorData := &entity.Instructor{
+		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
+		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
+		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
+		CreatedAt:   time.Now(),
+	}
+
+	validateError := instructorController.customValidator.Validate.Struct(instructorData)
+	if validateError != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(validateError.Error()))
+	}
+
+	result, err := instructorController.instructorService.CreateInstructor(*instructorData)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
+		}
+		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+
+	/*return instructorController.responder.Data(GetInstructorResponse{
 		Status: 200,
 		Data:   instructor,
 	})
