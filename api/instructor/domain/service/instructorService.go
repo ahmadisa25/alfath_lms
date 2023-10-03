@@ -1,8 +1,8 @@
 package service
 
 import (
-	"alfath_lms/instructor/domain/entity"
 	"alfath_lms/api/definitions"
+	"alfath_lms/api/instructor/domain/entity"
 )
 
 type InstructorServiceInterface interface {

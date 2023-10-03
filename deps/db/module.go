@@ -1,7 +1,7 @@
 package db
 
 import (
-	"alfath_lms/instructor/domain/entity"
+	"alfath_lms/api/instructor/domain/entity"
 
 	"flamingo.me/dingo"
 	"gorm.io/driver/mysql"

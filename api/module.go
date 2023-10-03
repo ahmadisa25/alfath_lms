@@ -1,10 +1,10 @@
 package api
 
 import (
+	"alfath_lms/api/instructor/domain/service"
+	"alfath_lms/api/instructor/infrastructure"
 	"alfath_lms/deps/db"
 	"alfath_lms/deps/validator"
-	"alfath_lms/instructor/domain/service"
-	"alfath_lms/instructor/infrastructure"
 
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3/framework/web"

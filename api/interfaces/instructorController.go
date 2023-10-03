@@ -3,9 +3,9 @@ package interfaces
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/funcs"
+	"alfath_lms/api/instructor/domain/entity"
+	"alfath_lms/api/instructor/domain/service"
 	"alfath_lms/deps/validator"
-	"alfath_lms/instructor/domain/entity"
-	"alfath_lms/instructor/domain/service"
 	"context"
 	"encoding/json"
 	"fmt"
