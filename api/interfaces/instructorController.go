@@ -85,7 +85,7 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 }
 
-func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
+func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
@@ -157,10 +157,10 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	/*return instructorController.responder.Data(GetInstructorResponse{
 		Status: 200,
 		Data:   instructor,
-	})*/
+	})
 }
 
-func (instructorController *InstructorController) Get(ctx context.Context, req *web.Request) web.Result {
+func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
@@ -193,10 +193,47 @@ func (instructorController *InstructorController) Get(ctx context.Context, req *
 		})
 	}
 
-	return instructorController.responder.Data(GetInstructorResponse{
-		Status: 200,
-		Data:   instructor,
-	})
+	formError := req.Request().ParseForm()
+	if formError != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(formError.Error()))
+	}
+
+	form := req.Request().Form
+
+	instructorData := &entity.Instructor{
+		Name:        funcs.ValidateOrOverwriteStringFormKeys("Name", form, "string", instructor).(string),
+		Email:       funcs.ValidateOrOverwriteStringFormKeys("Email", form, "string", instructor).(string),
+		MobilePhone: funcs.ValidateOrOverwriteStringFormKeys("MobilePhone", form, "string", instructor).(string),
+		CreatedAt:   time.Now(),
+	}
+
+	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
+	validateError := instructorController.validator.Validate.Struct(instructorData)
+	if validateError != nil {
+		errorResponse := funcs.ErrorPackagingForMaps(instructorController.validator.TranslateError(validateError))
+		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(400, strings.NewReader(errorResponse))
+	}
+
+	result, err := instructorController.instructorService.UpdateInstructor(intID, *instructorData)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
 }
 
 func PrintError(err error) error {
