@@ -22,7 +22,7 @@ func (instructorSvc *InstructorService) Inject(db *gorm.DB, paginator *paginatio
 func (instructorSvc *InstructorService) GetAllInstructors(req definitions.PaginationRequest) (definitions.PaginationResult, error){
 	paginationParams := definitions.PaginationParam{
 		Sql : "Select -select- from (Select * from ms_instructor) as foo",
-		SelectFields: []string{"Name", "Email", "MobilePhone"},
+		SelectFields: []string{"name", "email", "mobilephone"},
 	}
 
 	res:= instructorSvc.paginator.Paginate(req, paginationParams)

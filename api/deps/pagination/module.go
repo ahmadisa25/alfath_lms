@@ -32,17 +32,20 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 
 		for _, selectField := range strings.Split(req.SelectedColumns,","){
 			var isExist bool
+			selectField = strings.ToLower(selectField)
 			for _, element := range prm.SelectFields{
 				if element == selectField{
-					continue
+					isExist = true
+					break
 				}
 			}
 			if !isExist {
 				return definitions.PaginationResult{}
 			}
 		}
-
 		sql = strings.Replace(sql, "-select-", req.SelectedColumns, -1)
+	} else {
+		sql = strings.Replace(sql, "-select-", "*", -1)
 	}
 
 	fmt.Println(sql)
