@@ -6,6 +6,7 @@ import (
 )
 
 type InstructorServiceInterface interface {
+	GetAllInstructors(req definitions.PaginationRequest) (definitions.PaginationResult, error)
 	GetInstructor(id int) (entity.Instructor, error)
 	DeleteInstructor(id int) (definitions.GenericAPIMessage, error)
 	CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error)

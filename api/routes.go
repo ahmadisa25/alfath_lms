@@ -22,4 +22,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/instructor/", "instructor")
 	registry.HandlePost("instructor", routes.instructorController.Create)
+
+	registry.Route("/instructor-all/", "instructor-all")
+	registry.HandleGet("instructor-all", routes.instructorController.GetAll)
 }

@@ -5,16 +5,28 @@ import (
 	"alfath_lms/api/instructor/domain/entity"
 	"errors"
 	"fmt"
-
+	"alfath_lms/api/deps/pagination"
 	"gorm.io/gorm"
 )
 
 type InstructorService struct {
 	db *gorm.DB
+	paginator *pagination.Paginator
 }
 
-func (instructorSvc *InstructorService) Inject(db *gorm.DB) {
+func (instructorSvc *InstructorService) Inject(db *gorm.DB, paginator *pagination.Paginator) {
 	instructorSvc.db = db
+	instructorSvc.paginator = paginator
+}
+
+func (instructorSvc *InstructorService) GetAllInstructors(req definitions.PaginationRequest) (definitions.PaginationResult, error){
+	paginationParams := definitions.PaginationParam{
+		Sql : "Select -select- from (Select * from ms_instructor) as foo",
+		SelectFields: []string{"Name", "Email", "MobilePhone"},
+	}
+
+	res:= instructorSvc.paginator.Paginate(req, paginationParams)
+	return res, nil
 }
 
 func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {

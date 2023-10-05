@@ -68,6 +68,23 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 	return key[0]
 }
 
+func ValidateStringParamKeys(mapKey string, form map[string]string, dataType string) interface{} {
+	key, keyOk := form[mapKey]
+	if !keyOk {
+		if dataType == "string" {
+			return ""
+		} else if dataType == "int" || dataType == "uint" {
+			return 0
+		} else if dataType == "bool" {
+			return false
+		}
+
+		return nil
+	}
+
+	return key[0]
+}
+
 func ValidateOrOverwriteStringFormKeys(mapKey string, form map[string][]string, dataType string, input interface{}) interface{} {
 	//used form Flamingo Form Requests (r.Request().Form)
 

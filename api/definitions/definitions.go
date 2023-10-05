@@ -9,3 +9,23 @@ type GenericCreationMessage struct {
 	Status     int
 	InstanceID int
 }
+
+type StringSlice []string
+
+type PaginationParam struct {
+	Sql string
+	//SearchFields map[string]interface{}
+	SelectFields StringSlice
+}
+
+type PaginationRequest struct {
+	SelectedColumns string
+}
+
+type PaginationResult struct{
+	Data interface{}
+	Page int
+	PerPage int
+	Total int
+	Status int
+}

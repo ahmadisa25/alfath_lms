@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
 	"flamingo.me/flamingo/v3/framework/web"
 )
 
@@ -176,7 +175,6 @@ func (instructorController *InstructorController) Delete(ctx context.Context, re
 }
 
 func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
-	fmt.Println("masuk")
 	if req.Params["id"] == "" {
 		return instructorController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
@@ -250,6 +248,32 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	}
 
 	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+}
+
+func (instructorController *InstructorController) GetAll(ctx context.Context, req *web.Request) web.Result {
+	query := req.QueryAll()
+
+	paginationReq := definitions.PaginationRequest{
+		SelectedColumns:        funcs.ValidateStringFormKeys("select", query, "string").(string),
+	}
+
+	result, err := instructorController.instructorService.GetAllInstructors(paginationReq)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+
 }
 
 func PrintError(err error) error {

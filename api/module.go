@@ -3,6 +3,7 @@ package api
 import (
 	"alfath_lms/api/deps/db"
 	"alfath_lms/api/deps/validator"
+	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/instructor/domain/service"
 	"alfath_lms/api/instructor/infrastructure"
 
@@ -23,6 +24,7 @@ func (module *Module) Configure(injector *dingo.Injector) {
 
 func (module *Module) Depends() []dingo.Module {
 	return []dingo.Module{
+		new(pagination.Module),
 		new(db.Module),
 		new(validator.Module),
 	}
