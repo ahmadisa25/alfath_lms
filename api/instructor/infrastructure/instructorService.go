@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"alfath_lms/api/definitions"
-	"alfath_lms/instructor/domain/entity"
+	"alfath_lms/api/instructor/domain/entity"
 	"errors"
 	"fmt"
 
@@ -40,15 +40,28 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instr
 	}, nil
 }
 
-func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericCreationMessage, error){
+func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericAPIMessage, error) {
 	var instructorTemp entity.Instructor
-	result := instructorSvc.db.Model(instructorTemp).Where("id=?", id).Updates(instructor)
+	result := instructorSvc.db.Model(&instructorTemp).Where("id = ?", id).Updates(&instructor)
+	fmt.Println(*result)
 	if result.Error != nil {
-		return definitions.GenericCreationMessage{}, result.Error
+		return definitions.GenericAPIMessage{}, result.Error
 	}
-	return definitions.GenericCreationMessage{
-		Status:     200,
-		InstanceID: instructor.ID,
+	return definitions.GenericAPIMessage{
+		Status:  200,
+		Message: "Instructor is successfully updated",
+	}, nil
+}
+
+func (instructorSvc *InstructorService) DeleteInstructor(id int) (definitions.GenericAPIMessage, error) {
+	//delete here means soft delete
+	result := instructorSvc.db.Where("id = ?", id).Delete(&entity.Instructor{})
+	if result.Error != nil {
+		return definitions.GenericAPIMessage{}, result.Error
+	}
+	return definitions.GenericAPIMessage{
+		Status:  200,
+		Message: "Instructor has been deleted successfully",
 	}, nil
 }
 

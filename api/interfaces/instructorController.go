@@ -2,10 +2,10 @@ package interfaces
 
 import (
 	"alfath_lms/api/definitions"
-	"alfath_lms/api/funcs"
 	"alfath_lms/api/deps/validator"
-	"alfath_lms/instructor/domain/entity"
-	"alfath_lms/instructor/domain/service"
+	"alfath_lms/api/funcs"
+	"alfath_lms/api/instructor/domain/entity"
+	"alfath_lms/api/instructor/domain/service"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,7 +19,7 @@ import (
 type (
 	InstructorController struct {
 		responder         *web.Responder
-		customValidator *validator.CustomValidator
+		customValidator   *validator.CustomValidator
 		instructorService service.InstructorServiceInterface
 	}
 
@@ -122,6 +122,57 @@ func (instructorController *InstructorController) Get(ctx context.Context, req *
 		Status: 200,
 		Data:   instructor,
 	})
+}
+
+func (instructorController *InstructorController) Delete(ctx context.Context, req *web.Request) web.Result {
+	if req.Params["id"] == "" {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an instructor!",
+		})
+	}
+
+	intID, err := strconv.Atoi(req.Params["id"])
+	//PrintError(err)
+
+	if intID <= 0 {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an instructor!",
+		})
+	}
+
+	instructor, err := instructorController.instructorService.GetInstructor(intID)
+	if err != nil {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		})
+	}
+
+	if instructor.ID <= 0 {
+		return instructorController.responder.Data(definitions.GenericAPIMessage{
+			Status:  404,
+			Message: "Instructor Not Found!",
+		})
+	}
+
+	result, err := instructorController.instructorService.DeleteInstructor(intID)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
 }
 
 func (instructorController *InstructorController) Update(ctx context.Context, req *web.Request) web.Result {
