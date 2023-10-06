@@ -14,12 +14,13 @@ type StringSlice []string
 
 type PaginationParam struct {
 	Sql string
-	//SearchFields map[string]interface{}
+	SearchFields map[string]string
 	SelectFields StringSlice
 }
 
 type PaginationRequest struct {
 	SelectedColumns string
+	Search string
 }
 
 type PaginationResult struct{

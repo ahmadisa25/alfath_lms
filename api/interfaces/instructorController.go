@@ -255,7 +255,8 @@ func (instructorController *InstructorController) GetAll(ctx context.Context, re
 
 	paginationReq := definitions.PaginationRequest{
 		SelectedColumns:        funcs.ValidateStringFormKeys("select", query, "string").(string),
-	}
+		Search: funcs.ValidateStringFormKeys("search", query, "string").(string),
+	}	
 
 	result, err := instructorController.instructorService.GetAllInstructors(paginationReq)
 	if err != nil {

@@ -27,6 +27,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 	paginator.PaginationReq = req
 	paginator.PaginationPrm = prm
 
+	whereClause := ""
+	whereParams := map[string]interface{}{}
+
 	sql := prm.Sql
 	if req.SelectedColumns != ""{
 
@@ -48,12 +51,39 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		sql = strings.Replace(sql, "-select-", "*", -1)
 	}
 
-	fmt.Println(sql)
+	if req.Search !="" {
+		fmt.Println(req.Search)
+		if whereClause == ""{
+			whereClause = "where "
+		} else {
+			whereClause = " and "
+		}
 
+		i:=0
+		for _, value := range prm.SearchFields{
+			fmt.Println(value)
+			whereClause = whereClause + fmt.Sprintf("lower(%s)", value) + " like lower(@search_value) "
+			whereParams["search_value"] = "%" + req.Search + "%"
+			if i < len(prm.SearchFields)-1{
+				whereClause = whereClause + " or "
+			}
+			i++
+		}
+	}
+	if whereClause != ""{
+		sql = strings.Replace(sql, "-where-", whereClause, 1)
+	} else {
+		sql = strings.Replace(sql, "-where-", "", -1)
+	}
 	//var instructor entity.Instructor
 	i := 0
 	mapResult := []interface{}{}
 	rows, err := paginator.db.Raw(sql).Rows()
+	if whereClause != "" {
+		fmt.Println(whereParams)
+		rows, err = paginator.db.Raw(sql, whereParams).Rows()
+	} 
+
 	if err != nil{
 		return definitions.PaginationResult{}
 	}

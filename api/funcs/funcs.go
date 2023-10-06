@@ -51,7 +51,7 @@ func GetStructField(value interface{}, fieldName string) interface{} {
 
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {
 	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
-	//used form Flamingo Form Requests (r.Request().Form)
+	//used form Flamingo Form Requests (r.Request().Form) or Queries (r.QueryAll())
 	key, keyOk := form[mapKey]
 	if !keyOk {
 		if dataType == "string" {
