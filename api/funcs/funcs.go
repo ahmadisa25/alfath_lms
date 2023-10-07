@@ -4,6 +4,7 @@ import (
 	"alfath_lms/api/definitions"
 	"encoding/json"
 	"reflect"
+	"strconv"
 )
 
 func ErrorPackaging(err string, status int) (string, error) {
@@ -52,6 +53,7 @@ func GetStructField(value interface{}, fieldName string) interface{} {
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {
 	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
 	//used form Flamingo Form Requests (r.Request().Form) or Queries (r.QueryAll())
+
 	key, keyOk := form[mapKey]
 	if !keyOk {
 		if dataType == "string" {
@@ -64,7 +66,13 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 
 		return nil
 	}
-
+	if dataType == "int"{
+		res, err := strconv.Atoi(key[0])
+		if err != nil{
+			return err
+		}
+		return res
+	}
 	return key[0]
 }
 

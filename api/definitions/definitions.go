@@ -21,6 +21,7 @@ type PaginationParam struct {
 type PaginationRequest struct {
 	SelectedColumns string
 	Search string
+	PerPage int
 }
 
 type PaginationResult struct{
