@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
 	"flamingo.me/flamingo/v3/framework/web"
 )
 
@@ -253,31 +254,10 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 func (instructorController *InstructorController) GetAll(ctx context.Context, req *web.Request) web.Result {
 	query := req.QueryAll()
 	paginationReq := definitions.PaginationRequest{
-		SelectedColumns:        funcs.ValidateStringFormKeys("select", query, "string").(string),
-		Search: funcs.ValidateStringFormKeys("search", query, "string").(string),
-		PerPage:  funcs.ValidateStringFormKeys("perpage", query, "int").(int),
-	}	
-
-	if paginationReq.PerPage == 0 {
-		paginationReq.PerPage = 10
+		SelectedColumns: funcs.ValidateStringFormKeys("select", query, "string").(string),
+		Search:          funcs.ValidateStringFormKeys("search", query, "string").(string),
+		PerPage:         funcs.ValidateStringFormKeys("perpage", query, "string").(string),
 	}
-
-	/*if perPage != ""{
-		perPageInt, err := strconv.Atoi(perPage)
-		if err != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
-		}
-
-		fmt.Println(perPageInt)
-
-		if perPageInt == 0 {
-			perPageInt = 10
-		}
-
-		paginationReq.PerPage = perPageInt
-	}
-
-	fmt.Println(paginationReq)*/
 
 	result, err := instructorController.instructorService.GetAllInstructors(paginationReq)
 	if err != nil {

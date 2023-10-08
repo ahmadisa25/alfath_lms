@@ -1,29 +1,29 @@
 package pagination
 
-import(
+import (
 	"alfath_lms/api/definitions"
 	//"alfath_lms/api/instructor/domain/entity"
+	"fmt"
+	"strconv"
 	"strings"
+
 	"flamingo.me/dingo"
 	"gorm.io/gorm"
-	"fmt"
 )
-
 
 type Module struct{}
 
 type Paginator struct {
 	PaginationReq definitions.PaginationRequest
 	PaginationPrm definitions.PaginationParam
-	db *gorm.DB
+	db            *gorm.DB
 }
-
 
 func (paginator *Paginator) Inject(db *gorm.DB) {
 	paginator.db = db
 }
 
-func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm definitions.PaginationParam) (definitions.PaginationResult){
+func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm definitions.PaginationParam) definitions.PaginationResult {
 	paginator.PaginationReq = req
 	paginator.PaginationPrm = prm
 
@@ -31,13 +31,13 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 	whereParams := map[string]interface{}{}
 
 	sql := prm.Sql
-	if req.SelectedColumns != ""{
+	if req.SelectedColumns != "" {
 
-		for _, selectField := range strings.Split(req.SelectedColumns,","){
+		for _, selectField := range strings.Split(req.SelectedColumns, ",") {
 			var isExist bool
 			selectField = strings.ToLower(selectField)
-			for _, element := range prm.SelectFields{
-				if element == selectField{
+			for _, element := range prm.SelectFields {
+				if element == selectField {
 					isExist = true
 					break
 				}
@@ -51,56 +51,78 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		sql = strings.Replace(sql, "-select-", "*", -1)
 	}
 
-	if req.Search !="" {
+	if req.Search != "" {
 		fmt.Println(req.Search)
-		if whereClause == ""{
+		if whereClause == "" {
 			whereClause = "where "
 		} else {
 			whereClause = " and "
 		}
 
-		i:=0
-		for _, value := range prm.SearchFields{
+		i := 0
+		for _, value := range prm.SearchFields {
 			fmt.Println(value)
 			whereClause = whereClause + fmt.Sprintf("lower(%s)", value) + " like lower(@search_value) "
 			whereParams["search_value"] = "%" + req.Search + "%"
-			if i < len(prm.SearchFields)-1{
+			if i < len(prm.SearchFields)-1 {
 				whereClause = whereClause + " or "
 			}
 			i++
 		}
 	}
-	if whereClause != ""{
+	if whereClause != "" {
 		sql = strings.Replace(sql, "-where-", whereClause, 1)
 	} else {
 		sql = strings.Replace(sql, "-where-", "", -1)
 	}
-	//var instructor entity.Instructor
-	i := 0
-	mapResult := []interface{}{}
-	rows, err := paginator.db.Raw(sql).Rows()
-	if whereClause != "" {
-		fmt.Println(whereParams)
-		rows, err = paginator.db.Raw(sql, whereParams).Rows()
-	} 
 
-	if err != nil{
+	if req.PerPage == "" {
+		req.PerPage = "10"
+	}
+
+	sql = sql + "limit " + req.PerPage
+
+	perpage, convErr := strconv.Atoi(req.PerPage)
+
+	if convErr != nil {
 		return definitions.PaginationResult{}
 	}
 
-	for rows.Next(){
+	i := 0
+	mapResult := []interface{}{}
+	rows, err := paginator.db.Raw(sql).Rows()
+	if err != nil {
+		return definitions.PaginationResult{}
+	}
+	if whereClause != "" {
+		fmt.Println(whereParams)
+		rows, err = paginator.db.Raw(sql, whereParams).Rows() //Limit in gorm just limits the rows you are taking from the database. It doesn't necessary add "Limit" to your SQL query probably, because if you iterate the rows with rows.Next(), rows that are outside of the limit is still accessed.
+	}
+
+	defer rows.Close()
+
+	if err != nil {
+		return definitions.PaginationResult{}
+	}
+
+	for rows.Next() {
+		/*if i == req.PerPage {
+			break
+			//due to the quirk of Limit and Rows.Next logic, without this piece of code, it will just take everything
+			//from the db table instead of limiting it. This only happens if you use rows.Next()
+		}*/
 		data := make(map[string]interface{})
 		paginator.db.ScanRows(rows, &data)
-		mapResult = append(mapResult,data)
+		mapResult = append(mapResult, data)
 		i++
 	}
 
-	result:= definitions.PaginationResult{
-		Data: mapResult,
-		Page: 1,
-		PerPage: 10,
-		Total: 1,
-		Status: 200,
+	result := definitions.PaginationResult{
+		Data:    mapResult,
+		Page:    1,
+		PerPage: perpage,
+		Total:   1,
+		Status:  200,
 	}
 
 	return result

@@ -13,21 +13,21 @@ type GenericCreationMessage struct {
 type StringSlice []string
 
 type PaginationParam struct {
-	Sql string
+	Sql          string
 	SearchFields map[string]string
 	SelectFields StringSlice
 }
 
 type PaginationRequest struct {
 	SelectedColumns string
-	Search string
-	PerPage int
+	Search          string
+	PerPage         string
 }
 
-type PaginationResult struct{
-	Data interface{}
-	Page int
+type PaginationResult struct {
+	Data    interface{}
+	Page    int
 	PerPage int
-	Total int
-	Status int
+	Total   int
+	Status  int
 }
