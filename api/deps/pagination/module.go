@@ -91,7 +91,7 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		return definitions.PaginationResult{}
 	}
 
-	i := 0
+	total := 0
 	mapResult := []interface{}{}
 	rows, err := paginator.db.Raw(sql).Rows()
 	if err != nil {
@@ -116,14 +116,14 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		data := make(map[string]interface{})
 		paginator.db.ScanRows(rows, &data)
 		mapResult = append(mapResult, data)
-		i++
+		total++
 	}
 
 	result := definitions.PaginationResult{
 		Data:    mapResult,
 		Page:    1,
 		PerPage: perpage,
-		Total:   1,
+		Total:   total,
 		Status:  200,
 	}
 
