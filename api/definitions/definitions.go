@@ -22,6 +22,7 @@ type PaginationRequest struct {
 	SelectedColumns string
 	Search          string
 	PerPage         string
+	OrderBy 		string
 }
 
 type PaginationResult struct {

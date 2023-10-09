@@ -52,7 +52,6 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 	}
 
 	if req.Search != "" {
-		fmt.Println(req.Search)
 		if whereClause == "" {
 			whereClause = "where "
 		} else {
@@ -61,7 +60,6 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 
 		i := 0
 		for _, value := range prm.SearchFields {
-			fmt.Println(value)
 			whereClause = whereClause + fmt.Sprintf("lower(%s)", value) + " like lower(@search_value) "
 			whereParams["search_value"] = "%" + req.Search + "%"
 			if i < len(prm.SearchFields)-1 {
@@ -76,11 +74,16 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		sql = strings.Replace(sql, "-where-", "", -1)
 	}
 
+	if req.OrderBy != "" {
+		orderString := strings.Split(req.OrderBy, ":")
+		sql = sql + " order by " + orderString[0] + " " + orderString[1]
+	}
+
 	if req.PerPage == "" {
 		req.PerPage = "10"
 	}
 
-	sql = sql + "limit " + req.PerPage
+	sql = sql + " limit " + req.PerPage
 
 	perpage, convErr := strconv.Atoi(req.PerPage)
 
@@ -95,7 +98,6 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		return definitions.PaginationResult{}
 	}
 	if whereClause != "" {
-		fmt.Println(whereParams)
 		rows, err = paginator.db.Raw(sql, whereParams).Rows() //Limit in gorm just limits the rows you are taking from the database. It doesn't necessary add "Limit" to your SQL query probably, because if you iterate the rows with rows.Next(), rows that are outside of the limit is still accessed.
 	}
 
