@@ -83,9 +83,24 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		req.PerPage = "10"
 	}
 
+	perpage, convErr := strconv.Atoi(req.PerPage)
+
 	sql = sql + " limit " + req.PerPage
 
-	perpage, convErr := strconv.Atoi(req.PerPage)
+	offset := 0
+	offsetStr := "0"
+
+	if req.Page != "" {
+		pageInt, err := strconv.Atoi(req.Page)
+		if err != nil {
+			return definitions.PaginationResult{}
+		}
+
+		offset = (pageInt - 1) * perpage
+		fmt.Println(offset)
+		offsetStr = strconv.Itoa(offset)
+		sql = sql + " offset " + offsetStr
+	}
 
 	if convErr != nil {
 		return definitions.PaginationResult{}

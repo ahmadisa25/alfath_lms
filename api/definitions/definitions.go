@@ -20,9 +20,11 @@ type PaginationParam struct {
 
 type PaginationRequest struct {
 	SelectedColumns string
+	Page            string
 	Search          string
 	PerPage         string
-	OrderBy 		string
+	OrderBy         string
+	Paginate        string
 }
 
 type PaginationResult struct {
