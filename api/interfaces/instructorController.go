@@ -259,6 +259,7 @@ func (instructorController *InstructorController) GetAll(ctx context.Context, re
 		Page:            funcs.ValidateStringFormKeys("page", query, "string").(string),
 		PerPage:         funcs.ValidateStringFormKeys("perpage", query, "string").(string),
 		OrderBy:         funcs.ValidateStringFormKeys("order", query, "string").(string),
+		Filter:          funcs.ValidateStringFormKeys("filter", query, "string").(string),
 	}
 
 	result, err := instructorController.instructorService.GetAllInstructors(paginationReq)

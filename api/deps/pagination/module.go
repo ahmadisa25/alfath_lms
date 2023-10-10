@@ -55,7 +55,7 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		if whereClause == "" {
 			whereClause = "where "
 		} else {
-			whereClause = " and "
+			whereClause = whereClause + " and "
 		}
 
 		i := 0
@@ -68,6 +68,36 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 			i++
 		}
 	}
+
+	if req.Filter != "" {
+		idx := 0
+		if whereClause == "" {
+			whereClause = "where "
+		} else {
+			whereClause = whereClause + " and "
+		}
+
+		filters := strings.Split(req.Filter, ",")
+		for _, value := range filters {
+			filterKey := strings.Split(value, ":")
+			keyName := filterKey[0]
+			_, keyOk := prm.FilterFields[keyName]
+			if !keyOk {
+				return definitions.PaginationResult{}
+			}
+
+			strIdx := strconv.Itoa(idx)
+			whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") like lower(@filter_value" + strIdx + ")"
+			whereParams["filter_value"+strIdx] = "%" + filterKey[1] + "%"
+			if idx < len(filters)-1 {
+				whereClause = whereClause + " and "
+			}
+			idx++
+
+		}
+
+	}
+
 	if whereClause != "" {
 		sql = strings.Replace(sql, "-where-", whereClause, 1)
 	} else {
@@ -97,7 +127,6 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		}
 
 		offset = (pageInt - 1) * perpage
-		fmt.Println(offset)
 		offsetStr = strconv.Itoa(offset)
 		sql = sql + " offset " + offsetStr
 	}

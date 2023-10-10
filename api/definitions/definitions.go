@@ -16,6 +16,7 @@ type PaginationParam struct {
 	Sql          string
 	SearchFields map[string]string
 	SelectFields StringSlice
+	FilterFields map[string]string
 }
 
 type PaginationRequest struct {
@@ -25,6 +26,7 @@ type PaginationRequest struct {
 	PerPage         string
 	OrderBy         string
 	Paginate        string
+	Filter          string
 }
 
 type PaginationResult struct {
