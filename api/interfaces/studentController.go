@@ -280,10 +280,10 @@ func (studentController *StudentController) GetAll(ctx context.Context, req *web
 
 }
 
-func PrintError(err error) error {
+/*func PrintError(err error) error {
 	fmt.Println(err)
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
 	}
 	return nil
-}
+}*/

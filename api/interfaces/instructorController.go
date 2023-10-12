@@ -281,10 +281,10 @@ func (instructorController *InstructorController) GetAll(ctx context.Context, re
 
 }
 
-func PrintError(err error) error {
+/*func PrintError(err error) error {
 	fmt.Println(err)
 	if err != nil {
 		return fmt.Errorf("error: %v", err)
 	}
 	return nil
-}
+}*/
