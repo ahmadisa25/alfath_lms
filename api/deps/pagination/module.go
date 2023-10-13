@@ -2,7 +2,6 @@ package pagination
 
 import (
 	"alfath_lms/api/definitions"
-	//"alfath_lms/api/instructor/domain/entity"
 	"fmt"
 	"strconv"
 	"strings"

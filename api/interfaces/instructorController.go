@@ -4,8 +4,8 @@ import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/funcs"
-	"alfath_lms/api/instructor/domain/entity"
 	"alfath_lms/api/instructor/domain/service"
+	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -25,7 +25,7 @@ type (
 
 	GetInstructorResponse struct {
 		Status int
-		Data   entity.Instructor
+		Data   models.Instructor
 	}
 )
 
@@ -47,7 +47,7 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 	form := req.Request().Form
 
-	instructor := &entity.Instructor{
+	instructor := &models.Instructor{
 		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
 		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
@@ -215,7 +215,7 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 
 	form := req.Request().Form
 
-	instructorData := &entity.Instructor{
+	instructorData := &models.Instructor{
 		Name:        funcs.ValidateOrOverwriteStringFormKeys("Name", form, "string", instructor).(string),
 		Email:       funcs.ValidateOrOverwriteStringFormKeys("Email", form, "string", instructor).(string),
 		MobilePhone: funcs.ValidateOrOverwriteStringFormKeys("MobilePhone", form, "string", instructor).(string),

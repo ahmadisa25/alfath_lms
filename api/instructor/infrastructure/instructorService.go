@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/pagination"
-	"alfath_lms/api/instructor/domain/entity"
+	"alfath_lms/api/models"
 	"errors"
 	"fmt"
 
@@ -40,16 +40,16 @@ func (instructorSvc *InstructorService) GetAllInstructors(req definitions.Pagina
 	return res, nil
 }
 
-func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instructor) (definitions.GenericCreationMessage, error) {
+func (instructorSvc *InstructorService) CreateInstructor(instructor models.Instructor) (definitions.GenericCreationMessage, error) {
 
-	var instructorTemp entity.Instructor
+	var instructorTemp models.Instructor
 	instructorSvc.db.Where("Email = ?", instructor.Email).First(&instructorTemp)
-	if instructorTemp != (entity.Instructor{}) {
+	if instructorTemp != (models.Instructor{}) {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that email already exists!")
 	}
 
 	instructorSvc.db.Where("Mobile_Phone = ?", instructor.MobilePhone).First(&instructorTemp)
-	if instructorTemp != (entity.Instructor{}) {
+	if instructorTemp != (models.Instructor{}) {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that mobile phone already exists!")
 	}
 
@@ -63,8 +63,8 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor entity.Instr
 	}, nil
 }
 
-func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor entity.Instructor) (definitions.GenericAPIMessage, error) {
-	var instructorTemp entity.Instructor
+func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor models.Instructor) (definitions.GenericAPIMessage, error) {
+	var instructorTemp models.Instructor
 	result := instructorSvc.db.Model(&instructorTemp).Where("id = ?", id).Updates(&instructor)
 	fmt.Println(*result)
 	if result.Error != nil {
@@ -78,7 +78,7 @@ func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor enti
 
 func (instructorSvc *InstructorService) DeleteInstructor(id int) (definitions.GenericAPIMessage, error) {
 	//delete here means soft delete
-	result := instructorSvc.db.Where("id = ?", id).Delete(&entity.Instructor{})
+	result := instructorSvc.db.Where("id = ?", id).Delete(&models.Instructor{})
 	if result.Error != nil {
 		return definitions.GenericAPIMessage{}, result.Error
 	}
@@ -88,8 +88,8 @@ func (instructorSvc *InstructorService) DeleteInstructor(id int) (definitions.Ge
 	}, nil
 }
 
-func (instructorSvc *InstructorService) GetInstructor(id int) (entity.Instructor, error) {
-	var instructor entity.Instructor
+func (instructorSvc *InstructorService) GetInstructor(id int) (models.Instructor, error) {
+	var instructor models.Instructor
 
 	result := &instructor
 	instructorSvc.db.First(result, "id = ?", id)

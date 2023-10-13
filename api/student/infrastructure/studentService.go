@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/pagination"
-	"alfath_lms/api/student/domain/entity"
+	"alfath_lms/api/models"
 	"errors"
 	"fmt"
 
@@ -40,16 +40,16 @@ func (studentSvc *StudentService) GetAllStudents(req definitions.PaginationReque
 	return res, nil
 }
 
-func (studentSvc *StudentService) CreateStudent(student entity.Student) (definitions.GenericCreationMessage, error) {
+func (studentSvc *StudentService) CreateStudent(student models.Student) (definitions.GenericCreationMessage, error) {
 
-	var studentTemp entity.Student
+	var studentTemp models.Student
 	studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
-	if studentTemp != (entity.Student{}) {
+	if studentTemp != (models.Student{}) {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that email already exists!")
 	}
 
 	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
-	if studentTemp != (entity.Student{}) {
+	if studentTemp != (models.Student{}) {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that mobile phone already exists!")
 	}
 
@@ -63,8 +63,8 @@ func (studentSvc *StudentService) CreateStudent(student entity.Student) (definit
 	}, nil
 }
 
-func (studentSvc *StudentService) UpdateStudent(id int, student entity.Student) (definitions.GenericAPIMessage, error) {
-	var studentTemp entity.Student
+func (studentSvc *StudentService) UpdateStudent(id int, student models.Student) (definitions.GenericAPIMessage, error) {
+	var studentTemp models.Student
 	result := studentSvc.db.Model(&studentTemp).Where("id = ?", id).Updates(&student)
 	fmt.Println(*result)
 	if result.Error != nil {
@@ -78,7 +78,7 @@ func (studentSvc *StudentService) UpdateStudent(id int, student entity.Student) 
 
 func (studentSvc *StudentService) DeleteStudent(id int) (definitions.GenericAPIMessage, error) {
 	//delete here means soft delete
-	result := studentSvc.db.Where("id = ?", id).Delete(&entity.Student{})
+	result := studentSvc.db.Where("id = ?", id).Delete(&models.Student{})
 	if result.Error != nil {
 		return definitions.GenericAPIMessage{}, result.Error
 	}
@@ -88,8 +88,8 @@ func (studentSvc *StudentService) DeleteStudent(id int) (definitions.GenericAPIM
 	}, nil
 }
 
-func (studentSvc *StudentService) GetStudent(id int) (entity.Student, error) {
-	var student entity.Student
+func (studentSvc *StudentService) GetStudent(id int) (models.Student, error) {
+	var student models.Student
 
 	result := &student
 	studentSvc.db.First(result, "id = ?", id)

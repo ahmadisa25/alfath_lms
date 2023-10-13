@@ -1,8 +1,7 @@
 package db
 
 import (
-	e_inst "alfath_lms/api/instructor/domain/entity"
-	e_stud "alfath_lms/api/student/domain/entity"
+	"alfath_lms/api/models"
 
 	"fmt"
 	"os"
@@ -23,7 +22,7 @@ func (*Module) Configure(injector *dingo.Injector) {
 			panic(err)
 		}
 
-		db.AutoMigrate(&e_inst.Instructor{}, &e_stud.Student{})
+		db.AutoMigrate(&models.Instructor{}, &models.Student{})
 
 		return db
 	}).In(dingo.Singleton)

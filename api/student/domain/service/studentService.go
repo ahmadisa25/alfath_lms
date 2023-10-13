@@ -2,13 +2,13 @@ package service
 
 import (
 	"alfath_lms/api/definitions"
-	"alfath_lms/api/student/domain/entity"
+	"alfath_lms/api/models"
 )
 
 type StudentServiceInterface interface {
 	GetAllStudents(req definitions.PaginationRequest) (definitions.PaginationResult, error)
-	GetStudent(id int) (entity.Student, error)
+	GetStudent(id int) (models.Student, error)
 	DeleteStudent(id int) (definitions.GenericAPIMessage, error)
-	CreateStudent(Student entity.Student) (definitions.GenericCreationMessage, error)
-	UpdateStudent(id int, Student entity.Student) (definitions.GenericAPIMessage, error)
+	CreateStudent(Student models.Student) (definitions.GenericCreationMessage, error)
+	UpdateStudent(id int, Student models.Student) (definitions.GenericAPIMessage, error)
 }

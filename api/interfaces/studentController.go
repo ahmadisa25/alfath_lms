@@ -4,7 +4,7 @@ import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/funcs"
-	"alfath_lms/api/student/domain/entity"
+	"alfath_lms/api/models"
 	"alfath_lms/api/student/domain/service"
 	"context"
 	"encoding/json"
@@ -25,7 +25,7 @@ type (
 
 	GetStudentResponse struct {
 		Status int
-		Data   entity.Student
+		Data   models.Student
 	}
 )
 
@@ -47,7 +47,7 @@ func (studentController *StudentController) Create(ctx context.Context, req *web
 
 	form := req.Request().Form
 
-	student := &entity.Student{
+	student := &models.Student{
 		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
 		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
@@ -214,7 +214,7 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 
 	form := req.Request().Form
 
-	studentData := &entity.Student{
+	studentData := &models.Student{
 		Name:        funcs.ValidateOrOverwriteStringFormKeys("Name", form, "string", student).(string),
 		Email:       funcs.ValidateOrOverwriteStringFormKeys("Email", form, "string", student).(string),
 		MobilePhone: funcs.ValidateOrOverwriteStringFormKeys("MobilePhone", form, "string", student).(string),
