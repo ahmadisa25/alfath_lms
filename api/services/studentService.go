@@ -1,4 +1,4 @@
-package infrastructure
+package services
 
 import (
 	"alfath_lms/api/definitions"
@@ -96,11 +96,4 @@ func (studentSvc *StudentService) GetStudent(id int) (models.Student, error) {
 
 	return *result, nil
 
-}
-
-func PrintError(err error) error {
-	if err != nil {
-		return fmt.Errorf("error: %v", err)
-	}
-	return nil
 }

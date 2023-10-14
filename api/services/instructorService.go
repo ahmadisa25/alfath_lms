@@ -1,4 +1,4 @@
-package infrastructure
+package services
 
 import (
 	"alfath_lms/api/definitions"

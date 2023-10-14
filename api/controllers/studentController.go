@@ -1,11 +1,11 @@
-package interfaces
+package controllers
 
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/funcs"
+	"alfath_lms/api/interfaces"
 	"alfath_lms/api/models"
-	"alfath_lms/api/student/domain/service"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -20,7 +20,7 @@ type (
 	StudentController struct {
 		responder       *web.Responder
 		customValidator *validator.CustomValidator
-		studentService  service.StudentServiceInterface
+		studentService  interfaces.StudentServiceInterface
 	}
 
 	GetStudentResponse struct {
@@ -32,7 +32,7 @@ type (
 func (studentController *StudentController) Inject(
 	responder *web.Responder,
 	customValidator *validator.CustomValidator,
-	studentService service.StudentServiceInterface,
+	studentService interfaces.StudentServiceInterface,
 ) {
 	studentController.responder = responder
 	studentController.customValidator = customValidator

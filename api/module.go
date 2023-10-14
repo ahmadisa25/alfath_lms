@@ -4,10 +4,8 @@ import (
 	"alfath_lms/api/deps/db"
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/deps/validator"
-	instructor_service "alfath_lms/api/instructor/domain/service"
-	instructor_infrastructure "alfath_lms/api/instructor/infrastructure"
-	student_service "alfath_lms/api/student/domain/service"
-	student_infrastructure "alfath_lms/api/student/infrastructure"
+	"alfath_lms/api/interfaces"
+	"alfath_lms/api/services"
 
 	"flamingo.me/dingo"
 	"flamingo.me/flamingo/v3/framework/web"
@@ -20,8 +18,8 @@ func (module *Module) Configure(injector *dingo.Injector) {
 	/*if os.Getenv("fake") == "true" {
 		injector.Bind(new(service.InstructorServiceInterface)).To(infrastructure.FakeOrderService{})
 	} else {*/
-	injector.Bind(new(instructor_service.InstructorServiceInterface)).To(instructor_infrastructure.InstructorService{})
-	injector.Bind(new(student_service.StudentServiceInterface)).To(student_infrastructure.StudentService{})
+	injector.Bind(new(interfaces.InstructorServiceInterface)).To(services.InstructorService{})
+	injector.Bind(new(interfaces.StudentServiceInterface)).To(services.StudentService{})
 	//}
 }
 

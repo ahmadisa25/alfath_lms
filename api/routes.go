@@ -1,19 +1,19 @@
 package api
 
 import (
-	"alfath_lms/api/interfaces"
+	"alfath_lms/api/controllers"
 
 	"flamingo.me/flamingo/v3/framework/web"
 )
 
 type Routes struct {
-	instructorController interfaces.InstructorController
-	studentController    interfaces.StudentController
+	instructorController controllers.InstructorController
+	studentController    controllers.StudentController
 }
 
 func (routes *Routes) Inject(
-	instructorController *interfaces.InstructorController,
-	studentController *interfaces.StudentController,
+	instructorController *controllers.InstructorController,
+	studentController *controllers.StudentController,
 ) {
 	routes.instructorController = *instructorController
 	routes.studentController = *studentController
