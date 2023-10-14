@@ -183,7 +183,12 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
-	//PrintError(err)
+	if err != nil {
+		return studentController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		})
+	}
 
 	if intID <= 0 {
 		return studentController.responder.Data(definitions.GenericAPIMessage{
@@ -232,7 +237,7 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 		return studentController.responder.HTTP(400, strings.NewReader(errorResponse))
 	}
 
-	result, err := studentController.studentService.UpdateStudent(intID, *studentData)
+	result, err := studentController.studentService.UpdateStudent(intID, *studentData, student)
 	if err != nil {
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)

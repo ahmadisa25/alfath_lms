@@ -63,8 +63,23 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor models.Instr
 	}, nil
 }
 
-func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor models.Instructor) (definitions.GenericAPIMessage, error) {
+func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor models.Instructor, existingInstructor models.Instructor) (definitions.GenericAPIMessage, error) {
 	var instructorTemp models.Instructor
+	instructorSvc.db.Where("Email = ?", instructor.Email).First(&instructorTemp)
+	if instructorTemp != (models.Instructor{}) && existingInstructor.Email != instructor.Email {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Instructor with that email already exists!",
+		}, nil
+	}
+
+	instructorSvc.db.Where("Mobile_Phone = ?", instructor.MobilePhone).First(&instructorTemp)
+	if instructorTemp != (models.Instructor{}) && existingInstructor.MobilePhone != instructor.MobilePhone {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Instructor with that mobile phone already exists!",
+		}, nil
+	}
 	result := instructorSvc.db.Model(&instructorTemp).Where("id = ?", id).Updates(&instructor)
 	fmt.Println(*result)
 	if result.Error != nil {

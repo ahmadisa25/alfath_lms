@@ -10,5 +10,5 @@ type StudentServiceInterface interface {
 	GetStudent(id int) (models.Student, error)
 	DeleteStudent(id int) (definitions.GenericAPIMessage, error)
 	CreateStudent(Student models.Student) (definitions.GenericCreationMessage, error)
-	UpdateStudent(id int, Student models.Student) (definitions.GenericAPIMessage, error)
+	UpdateStudent(id int, Student models.Student, existingStudent models.Student) (definitions.GenericAPIMessage, error)
 }

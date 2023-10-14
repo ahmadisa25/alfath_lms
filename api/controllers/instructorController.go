@@ -184,6 +184,9 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
+	if err != nil {
+		return instructorController.responder.HTTP(500, strings.NewReader(err.Error()))
+	}
 	//PrintError(err)
 
 	if intID <= 0 {
@@ -233,9 +236,8 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 		return instructorController.responder.HTTP(400, strings.NewReader(errorResponse))
 	}
 
-	result, err := instructorController.instructorService.UpdateInstructor(intID, *instructorData)
+	result, err := instructorController.instructorService.UpdateInstructor(intID, *instructorData, instructor)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))

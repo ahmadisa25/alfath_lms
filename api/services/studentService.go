@@ -63,8 +63,23 @@ func (studentSvc *StudentService) CreateStudent(student models.Student) (definit
 	}, nil
 }
 
-func (studentSvc *StudentService) UpdateStudent(id int, student models.Student) (definitions.GenericAPIMessage, error) {
+func (studentSvc *StudentService) UpdateStudent(id int, student models.Student, existingStudent models.Student) (definitions.GenericAPIMessage, error) {
 	var studentTemp models.Student
+	studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
+	if studentTemp != (models.Student{}) && existingStudent.Email != student.Email {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Student with that email already exists!",
+		}, nil
+	}
+
+	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
+	if studentTemp != (models.Student{}) && existingStudent.MobilePhone != student.MobilePhone {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Student with that mobile phone already exists!",
+		}, nil
+	}
 	result := studentSvc.db.Model(&studentTemp).Where("id = ?", id).Updates(&student)
 	fmt.Println(*result)
 	if result.Error != nil {

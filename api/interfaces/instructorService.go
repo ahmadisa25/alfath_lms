@@ -10,5 +10,5 @@ type InstructorServiceInterface interface {
 	GetInstructor(id int) (models.Instructor, error)
 	DeleteInstructor(id int) (definitions.GenericAPIMessage, error)
 	CreateInstructor(instructor models.Instructor) (definitions.GenericCreationMessage, error)
-	UpdateInstructor(id int, instructor models.Instructor) (definitions.GenericAPIMessage, error)
+	UpdateInstructor(id int, instructor models.Instructor, existingInstructor models.Instructor) (definitions.GenericAPIMessage, error)
 }
