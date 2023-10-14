@@ -21,7 +21,11 @@ func (*Module) Configure(injector *dingo.Injector) {
 			panic(err)
 		}
 
-		db.AutoMigrate(&models.Instructor{}, &models.Student{})
+		db.AutoMigrate(
+			&models.Instructor{},
+			&models.Student{},
+			&models.Course{},
+		)
 
 		return db
 	}).In(dingo.Singleton)
