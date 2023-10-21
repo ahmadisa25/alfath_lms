@@ -44,12 +44,12 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor models.Instr
 
 	var instructorTemp models.Instructor
 	instructorSvc.db.Where("Email = ?", instructor.Email).First(&instructorTemp)
-	if instructorTemp != (models.Instructor{}) {
+	if instructorTemp.Email != "" {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that email already exists!")
 	}
 
 	instructorSvc.db.Where("Mobile_Phone = ?", instructor.MobilePhone).First(&instructorTemp)
-	if instructorTemp != (models.Instructor{}) {
+	if instructorTemp.MobilePhone != "" {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that mobile phone already exists!")
 	}
 
@@ -66,7 +66,7 @@ func (instructorSvc *InstructorService) CreateInstructor(instructor models.Instr
 func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor models.Instructor, existingInstructor models.Instructor) (definitions.GenericAPIMessage, error) {
 	var instructorTemp models.Instructor
 	instructorSvc.db.Where("Email = ?", instructor.Email).First(&instructorTemp)
-	if instructorTemp != (models.Instructor{}) && existingInstructor.Email != instructor.Email {
+	if instructorTemp.Email != "" && existingInstructor.Email != instructor.Email {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Instructor with that email already exists!",
@@ -74,7 +74,7 @@ func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor mode
 	}
 
 	instructorSvc.db.Where("Mobile_Phone = ?", instructor.MobilePhone).First(&instructorTemp)
-	if instructorTemp != (models.Instructor{}) && existingInstructor.MobilePhone != instructor.MobilePhone {
+	if instructorTemp.MobilePhone != "" && existingInstructor.MobilePhone != instructor.MobilePhone {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Instructor with that mobile phone already exists!",

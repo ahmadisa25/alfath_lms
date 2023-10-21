@@ -44,12 +44,12 @@ func (studentSvc *StudentService) CreateStudent(student models.Student) (definit
 
 	var studentTemp models.Student
 	studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
-	if studentTemp != (models.Student{}) {
+	if studentTemp.Email != "" {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that email already exists!")
 	}
 
 	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
-	if studentTemp != (models.Student{}) {
+	if studentTemp.MobilePhone != "" {
 		return definitions.GenericCreationMessage{}, errors.New("Data with that mobile phone already exists!")
 	}
 
@@ -66,7 +66,7 @@ func (studentSvc *StudentService) CreateStudent(student models.Student) (definit
 func (studentSvc *StudentService) UpdateStudent(id int, student models.Student, existingStudent models.Student) (definitions.GenericAPIMessage, error) {
 	var studentTemp models.Student
 	studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
-	if studentTemp != (models.Student{}) && existingStudent.Email != student.Email {
+	if studentTemp.Email != "" && existingStudent.Email != student.Email {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Student with that email already exists!",
@@ -74,7 +74,7 @@ func (studentSvc *StudentService) UpdateStudent(id int, student models.Student, 
 	}
 
 	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
-	if studentTemp != (models.Student{}) && existingStudent.MobilePhone != student.MobilePhone {
+	if studentTemp.MobilePhone != "" && existingStudent.MobilePhone != student.MobilePhone {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Student with that mobile phone already exists!",

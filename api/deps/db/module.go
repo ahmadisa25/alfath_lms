@@ -25,6 +25,9 @@ func (*Module) Configure(injector *dingo.Injector) {
 			&models.Instructor{},
 			&models.Student{},
 			&models.Course{},
+			&models.CourseChapter{},
+			&models.ChapterQuiz{},
+			&models.ChapterMaterial{},
 		)
 
 		return db
