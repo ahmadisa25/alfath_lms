@@ -103,6 +103,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		sql = strings.Replace(sql, "-where-", "", -1)
 	}
 
+	var total int64
+	paginator.db.Raw("SELECT COUNT(1) FROM (" + sql + ") as xxx").Scan(&total)
+
 	if req.OrderBy != "" {
 		orderString := strings.Split(req.OrderBy, ":")
 		sql = sql + " order by " + orderString[0] + " " + orderString[1]
@@ -134,9 +137,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		return definitions.PaginationResult{}
 	}
 
-	total := 0
 	mapResult := []interface{}{}
 	rows, err := paginator.db.Raw(sql).Rows()
+
 	if err != nil {
 		return definitions.PaginationResult{}
 	}
@@ -159,7 +162,7 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		data := make(map[string]interface{})
 		paginator.db.ScanRows(rows, &data)
 		mapResult = append(mapResult, data)
-		total++
+		//total++
 	}
 
 	result := definitions.PaginationResult{

@@ -8,6 +8,7 @@ import (
 	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -36,6 +37,36 @@ func (courseController *CourseController) Inject(
 	courseController.responder = responder
 	courseController.customValidator = customValidator
 	courseController.courseService = courseService
+}
+
+func (courseController *CourseController) GetAll(ctx context.Context, req *web.Request) web.Result {
+	query := req.QueryAll()
+	paginationReq := definitions.PaginationRequest{
+		SelectedColumns: funcs.ValidateStringFormKeys("select", query, "string").(string),
+		Search:          funcs.ValidateStringFormKeys("search", query, "string").(string),
+		Page:            funcs.ValidateStringFormKeys("page", query, "string").(string),
+		PerPage:         funcs.ValidateStringFormKeys("perpage", query, "string").(string),
+		OrderBy:         funcs.ValidateStringFormKeys("order", query, "string").(string),
+		Filter:          funcs.ValidateStringFormKeys("filter", query, "string").(string),
+	}
+
+	result, err := courseController.courseService.GetAll(paginationReq)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return courseController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+
 }
 
 func (courseController *CourseController) Get(ctx context.Context, req *web.Request) web.Result {

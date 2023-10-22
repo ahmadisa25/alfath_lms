@@ -33,6 +33,6 @@ type PaginationResult struct {
 	Data    interface{}
 	Page    int
 	PerPage int
-	Total   int
+	Total   int64
 	Status  int
 }

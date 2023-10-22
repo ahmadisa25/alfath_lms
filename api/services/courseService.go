@@ -25,16 +25,13 @@ func (courseSvc *CourseService) Inject(db *gorm.DB, paginator *pagination.Pagina
 func (courseSvc *CourseService) GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
 	paginationParams := definitions.PaginationParam{
 		Sql:          "Select -select- from (Select * from ms_course) as foo -where-",
-		SelectFields: []string{"name", "email", "mobile_phone"},
+		SelectFields: []string{"name", "description"},
 		SearchFields: map[string]string{
-			"name":         "foo.name",
-			"email":        "foo.email",
-			"mobile_phone": "foo.mobile_phone",
+			"name": "foo.name",
 		},
 		FilterFields: map[string]string{
-			"name":         "foo.name",
-			"email":        "foo.email",
-			"mobile_phone": "foo.mobile_phone",
+			"name":        "foo.name",
+			"description": "foo.description",
 		},
 	}
 
