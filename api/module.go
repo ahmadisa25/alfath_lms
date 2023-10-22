@@ -18,6 +18,7 @@ func (module *Module) Configure(injector *dingo.Injector) {
 	/*if os.Getenv("fake") == "true" {
 		injector.Bind(new(service.InstructorServiceInterface)).To(infrastructure.FakeOrderService{})
 	} else {*/
+	injector.Bind(new(interfaces.CourseServiceInterface)).To(services.CourseService{})
 	injector.Bind(new(interfaces.InstructorServiceInterface)).To(services.InstructorService{})
 	injector.Bind(new(interfaces.StudentServiceInterface)).To(services.StudentService{})
 	//}

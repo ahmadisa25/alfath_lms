@@ -112,10 +112,3 @@ func (instructorSvc *InstructorService) GetInstructor(id int) (models.Instructor
 	return *result, nil
 
 }
-
-func PrintError(err error) error {
-	if err != nil {
-		return fmt.Errorf("error: %v", err)
-	}
-	return nil
-}

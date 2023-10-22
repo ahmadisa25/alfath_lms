@@ -28,6 +28,8 @@ func (*Module) Configure(injector *dingo.Injector) {
 			&models.CourseChapter{},
 			&models.ChapterQuiz{},
 			&models.ChapterMaterial{},
+			&models.QuizQuestion{},
+			&models.QuizAnswer{},
 		)
 
 		return db

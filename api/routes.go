@@ -7,14 +7,17 @@ import (
 )
 
 type Routes struct {
+	courseController     controllers.CourseController
 	instructorController controllers.InstructorController
 	studentController    controllers.StudentController
 }
 
 func (routes *Routes) Inject(
+	courseController *controllers.CourseController,
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
 ) {
+	routes.courseController = *courseController
 	routes.instructorController = *instructorController
 	routes.studentController = *studentController
 }
@@ -30,6 +33,13 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", routes.instructorController.GetAll)
+
+	registry.Route("/course/", "course")
+	registry.HandlePost("course", routes.courseController.Create)
+
+	registry.Route("/course/:id", "course")
+	registry.HandleGet("course", routes.courseController.Get)
+	registry.HandleDelete("course", routes.courseController.Delete)
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", routes.studentController.Get)
