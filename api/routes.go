@@ -34,6 +34,9 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", routes.instructorController.GetAll)
 
+	registry.Route("/course-all/", "course-all")
+	registry.HandleGet("course-all", routes.courseController.GetAll)
+
 	registry.Route("/course/", "course")
 	registry.HandlePost("course", routes.courseController.Create)
 
