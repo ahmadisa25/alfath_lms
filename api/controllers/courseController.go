@@ -108,6 +108,97 @@ func (courseController *CourseController) Get(ctx context.Context, req *web.Requ
 	})
 }
 
+func (courseController *CourseController) Update(ctx context.Context, req *web.Request) web.Result {
+	if req.Params["id"] == "" {
+		return courseController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an course!",
+		})
+	}
+
+	intID, err := strconv.Atoi(req.Params["id"])
+	if err != nil {
+		return courseController.responder.HTTP(500, strings.NewReader(err.Error()))
+	}
+	//PrintError(err)
+
+	if intID <= 0 {
+		return courseController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an course!",
+		})
+	}
+
+	course, err := courseController.courseService.Get(intID)
+	if err != nil {
+		return courseController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		})
+	}
+
+	if course.ID <= 0 {
+		return courseController.responder.Data(definitions.GenericAPIMessage{
+			Status:  404,
+			Message: "Course Not Found!",
+		})
+	}
+
+	formError := req.Request().ParseForm()
+	if formError != nil {
+		return courseController.responder.HTTP(400, strings.NewReader(formError.Error()))
+	}
+
+	form := req.Request().Form
+
+	instructorList := ""
+	instructors, instructorsOk := form["Instructors"]
+	if !instructorsOk {
+		errorResponse, packError := funcs.ErrorPackaging("Please select instructors!", 500)
+		if packError != nil {
+			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+	} else {
+		instructorList = instructors[0]
+	}
+
+	courseData := &models.Course{
+		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
+		Description: funcs.ValidateStringFormKeys("Description", form, "string").(string),
+		Duration:    funcs.ValidateStringFormKeys("Duration", form, "int").(int),
+		CreatedAt:   time.Now(),
+		Instructors: []*models.Instructor{},
+	}
+
+	//fmt.Printf("validator: %+v\n", courseController.validator.validate)
+	validateError := courseController.customValidator.Validate.Struct(courseData)
+	if validateError != nil {
+		errorResponse := funcs.ErrorPackagingForMaps(courseController.customValidator.TranslateError(validateError))
+		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
+		if packError != nil {
+			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return courseController.responder.HTTP(400, strings.NewReader(errorResponse))
+	}
+
+	result, err := courseController.courseService.Update(intID, *courseData, instructorList)
+	if err != nil {
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return courseController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+}
+
 func (courseController *CourseController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return courseController.responder.Data(definitions.GenericAPIMessage{

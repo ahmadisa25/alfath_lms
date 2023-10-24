@@ -5,7 +5,6 @@ import (
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/models"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -67,15 +66,30 @@ func (courseSvc *CourseService) Create(course models.Course, instructorList stri
 	}, nil
 }
 
-func (courseSvc *CourseService) Update(id int, course models.Course, instructorList string) (definitions.GenericAPIMessage, error) {
-	result := courseSvc.db.Model(&course).Where("id = ?", id).Updates(&course)
-	fmt.Println(*result)
+func (courseSvc *CourseService) Update(course models.Course, instructorList string) (definitions.GenericAPIMessage, error) {
+	var instructors []*models.Instructor
+	instructorIDs := []int{}
+	for _, val := range strings.Split(instructorList, ",") {
+		intVal, err := strconv.Atoi(val)
+		if err != nil {
+			return definitions.GenericAPIMessage{}, err
+		}
+		instructorIDs = append(instructorIDs, intVal)
+	}
+	courseSvc.db.Table("ms_instructor").Where("id IN (?)", instructorIDs).Find(&instructors)
+	if len(instructors) == 0 {
+		return definitions.GenericAPIMessage{}, errors.New("Instructors don't exist")
+	}
+
+	course.Instructors = instructors
+
+	result := courseSvc.db.Updates(&course)
 	if result.Error != nil {
 		return definitions.GenericAPIMessage{}, result.Error
 	}
 	return definitions.GenericAPIMessage{
-		Status:  200,
-		Message: "Course is successfully updated",
+		Status:  201,
+		Message: "Course has been successfully updated",
 	}, nil
 }
 
