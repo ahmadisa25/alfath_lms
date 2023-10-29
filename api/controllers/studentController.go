@@ -223,7 +223,6 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 		Name:        funcs.ValidateOrOverwriteStringFormKeys("Name", form, "string", student).(string),
 		Email:       funcs.ValidateOrOverwriteStringFormKeys("Email", form, "string", student).(string),
 		MobilePhone: funcs.ValidateOrOverwriteStringFormKeys("MobilePhone", form, "string", student).(string),
-		CreatedAt:   time.Now(),
 	}
 
 	//fmt.Printf("validator: %+v\n", studentController.validator.validate)
