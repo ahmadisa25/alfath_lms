@@ -43,6 +43,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/course/:id", "course")
 	registry.HandleGet("course", routes.courseController.Get)
 	registry.HandleDelete("course", routes.courseController.Delete)
+	registry.HandlePut("course", routes.courseController.Update)
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", routes.studentController.Get)

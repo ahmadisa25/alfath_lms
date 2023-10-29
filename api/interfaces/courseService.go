@@ -10,5 +10,5 @@ type CourseServiceInterface interface {
 	Get(id int) (models.Course, error)
 	Delete(id int) (definitions.GenericAPIMessage, error)
 	Create(Course models.Course, instructorList string) (definitions.GenericCreationMessage, error)
-	Update(Course models.Course, instructorList string) (definitions.GenericAPIMessage, error)
+	Update(id int, Course models.Course, instructorList string) (definitions.GenericAPIMessage, error)
 }

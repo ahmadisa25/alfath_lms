@@ -66,7 +66,7 @@ func (courseSvc *CourseService) Create(course models.Course, instructorList stri
 	}, nil
 }
 
-func (courseSvc *CourseService) Update(course models.Course, instructorList string) (definitions.GenericAPIMessage, error) {
+func (courseSvc *CourseService) Update(id int, course models.Course, instructorList string) (definitions.GenericAPIMessage, error) {
 	var instructors []*models.Instructor
 	instructorIDs := []int{}
 	for _, val := range strings.Split(instructorList, ",") {
@@ -81,14 +81,24 @@ func (courseSvc *CourseService) Update(course models.Course, instructorList stri
 		return definitions.GenericAPIMessage{}, errors.New("Instructors don't exist")
 	}
 
+	//fmt.Println(course.Instructors)
 	course.Instructors = instructors
+	course.ID = id
+
+	//result := courseSvc.db.Updates(&course)
+	if len(instructors) > 0 {
+		instructorDelete := courseSvc.db.Table("ms_course_instructor").Where("course_id = ?", id).Unscoped().Delete(&models.Course{})
+		if instructorDelete.Error != nil {
+			return definitions.GenericAPIMessage{}, instructorDelete.Error
+		}
+	}
 
 	result := courseSvc.db.Updates(&course)
 	if result.Error != nil {
 		return definitions.GenericAPIMessage{}, result.Error
 	}
 	return definitions.GenericAPIMessage{
-		Status:  201,
+		Status:  200,
 		Message: "Course has been successfully updated",
 	}, nil
 }
