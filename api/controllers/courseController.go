@@ -167,7 +167,6 @@ func (courseController *CourseController) Update(ctx context.Context, req *web.R
 		Name:        funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description: funcs.ValidateStringFormKeys("Description", form, "string").(string),
 		Duration:    funcs.ValidateStringFormKeys("Duration", form, "int").(int),
-		CreatedAt:   time.Now(),
 		Instructors: []*models.Instructor{},
 	}
 
