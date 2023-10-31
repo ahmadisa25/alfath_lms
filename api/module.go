@@ -22,6 +22,7 @@ func (module *Module) Configure(injector *dingo.Injector) {
 	injector.Bind(new(interfaces.InstructorServiceInterface)).To(services.InstructorService{})
 	injector.Bind(new(interfaces.StudentServiceInterface)).To(services.StudentService{})
 	injector.Bind(new(interfaces.ChapterServiceInterface)).To(services.ChapterService{})
+	injector.Bind(new(interfaces.MaterialServiceInterface)).To(services.MaterialService{})
 	//}
 }
 
