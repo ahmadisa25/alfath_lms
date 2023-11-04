@@ -4,7 +4,6 @@ import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/models"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -20,7 +19,6 @@ func (chapterSvc *ChapterService) Inject(db *gorm.DB, paginator *pagination.Pagi
 }
 
 func (chapterSvc *ChapterService) Create(chapter models.CourseChapter) (definitions.GenericCreationMessage, error) {
-	fmt.Println("masuk")
 	result := chapterSvc.db.Create(&chapter)
 	if result.Error != nil {
 		return definitions.GenericCreationMessage{}, result.Error

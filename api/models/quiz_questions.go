@@ -12,7 +12,7 @@ type QuizQuestion struct {
 	Title         string      `validate:"required" json:"Title,omitempty"`
 	Type          string      `validate:"required" json:"Type,omitempty"`
 	Length        int         `validate:"required,numeric" json:"Length,omitempty"`
-	Choices       string      `validate:"required" json:"Choices,omitempty"`
+	Choices       string      `json:"Choices,omitempty"`
 	CreatedAt     time.Time   `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt     time.Time   `json:"UpdatedAt,omitempty"`
 	DeletedAt     time.Time   `gorm:"default:NULL" json:"DeletedAt,omitempty"`
