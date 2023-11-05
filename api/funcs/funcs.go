@@ -7,6 +7,17 @@ import (
 	"strconv"
 )
 
+func IsStringArrayItemExists(needle string, haystack []string) bool {
+
+	for _, element := range haystack {
+		if needle == element {
+			return true
+		}
+	}
+
+	return false
+}
+
 func ErrorPackaging(err string, status int) (string, error) {
 	res, resErr := json.Marshal(definitions.GenericAPIMessage{
 		Status:  status,
@@ -66,9 +77,9 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 
 		return nil
 	}
-	if dataType == "int"{
+	if dataType == "int" {
 		res, err := strconv.Atoi(key[0])
-		if err != nil{
+		if err != nil {
 			return err
 		}
 		return res

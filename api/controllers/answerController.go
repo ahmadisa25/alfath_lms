@@ -216,7 +216,7 @@ func (answerController *AnswerController) Create(ctx context.Context, req *web.R
 	answer := &models.QuizAnswer{
 		Answer:         funcs.ValidateStringFormKeys("Answer", form, "string").(string),
 		QuizQuestionID: funcs.ValidateStringFormKeys("QuizQuestion", form, "int").(int),
-		StudentID:      funcs.ValidateStringFormKeys("Student", form, "int").(int),
+		StudentID:      funcs.ValidateStringFormKeys("StudentID", form, "int").(int),
 		CreatedAt:      time.Now(),
 	}
 

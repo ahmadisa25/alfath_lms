@@ -11,8 +11,8 @@ type QuizQuestion struct {
 	ID            int         `gorm:"primaryKey" json:"ID,omitempty"`
 	Title         string      `validate:"required" json:"Title,omitempty"`
 	Type          string      `validate:"required" json:"Type,omitempty"`
-	Length        int         `validate:"required,numeric" json:"Length,omitempty"`
-	Choices       string      `json:"Choices,omitempty"`
+	Length        int         `validate:"required,numeric" json:"Length,omitempty"` //answer length
+	Choices       string      `json:"Choices,omitempty"`                            //harus separate by comma
 	CreatedAt     time.Time   `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt     time.Time   `json:"UpdatedAt,omitempty"`
 	DeletedAt     time.Time   `gorm:"default:NULL" json:"DeletedAt,omitempty"`
