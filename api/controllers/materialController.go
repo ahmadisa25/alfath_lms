@@ -24,7 +24,6 @@ type (
 	}
 
 	GetMaterialResponse struct {
-		Chapter
 		Status int
 		Data   models.ChapterMaterial
 	}
@@ -52,7 +51,7 @@ func (materialController *MaterialController) Create(ctx context.Context, req *w
 	material := &models.ChapterMaterial{
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		Duration:        funcs.ValidateStringFormKeys("Duration", form, "int").(int),
+		FileUrl:         funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
 		CourseChapterID: funcs.ValidateStringFormKeys("CourseID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
@@ -213,7 +212,7 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 			Message: "material Not Found!",
 		})
 	}
-
+	Update(
 	formError := req.Request().ParseForm()
 	if formError != nil {
 		return materialController.responder.HTTP(400, strings.NewReader(formError.Error()))
@@ -224,7 +223,7 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 	materialData := &models.ChapterMaterial{
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		Duration:        funcs.ValidateStringFormKeys("Duration", form, "int").(int),
+		FileUrl:     funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
 		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}

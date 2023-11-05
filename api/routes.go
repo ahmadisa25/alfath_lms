@@ -8,6 +8,7 @@ import (
 
 type Routes struct {
 	quizController       controllers.QuizController
+	answerController     controllers.AnswerController
 	materialController   controllers.MaterialController
 	chapterController    controllers.ChapterController
 	courseController     controllers.CourseController
@@ -16,6 +17,7 @@ type Routes struct {
 }
 
 func (routes *Routes) Inject(
+	answerController *controllers.AnswerController,
 	quizController *controllers.QuizController,
 	materialController *controllers.MaterialController,
 	chapterController *controllers.ChapterController,
@@ -23,6 +25,7 @@ func (routes *Routes) Inject(
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
 ) {
+	routes.answerController = *answerController
 	routes.quizController = *quizController
 	routes.materialController = *materialController
 	routes.courseController = *courseController
@@ -77,6 +80,14 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.HandleGet("chapter-quiz", routes.quizController.Get)
 	registry.HandleDelete("chapter-quiz", routes.quizController.Delete)
 	registry.HandlePut("chapter-quiz", routes.quizController.Update)
+
+	registry.Route("/quiz-answer/", "quiz-answer")
+	registry.HandlePost("quiz-answer", routes.answerController.Create)
+
+	registry.Route("/quiz-answer/:id", "quiz-answer")
+	registry.HandleGet("quiz-answer", routes.answerController.Get)
+	registry.HandleDelete("quiz-answer", routes.answerController.Delete)
+	registry.HandlePut("quiz-answer", routes.answerController.Update)
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", routes.studentController.Get)
