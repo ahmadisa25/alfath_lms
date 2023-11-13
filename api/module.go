@@ -2,6 +2,7 @@ package api
 
 import (
 	"alfath_lms/api/deps/db"
+	"alfath_lms/api/deps/mongo"
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/interfaces"
@@ -34,5 +35,6 @@ func (module *Module) Depends() []dingo.Module {
 		new(pagination.Module),
 		new(db.Module),
 		new(validator.Module),
+		new(mongo.Module),
 	}
 }
