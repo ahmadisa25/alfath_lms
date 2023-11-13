@@ -124,7 +124,7 @@ func (quizController *QuizController) Update(ctx context.Context, req *web.Reque
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
 		Duration:        funcs.ValidateStringFormKeys("Duration", form, "int").(int),
-		CourseChapterID: funcs.ValidateStringFormKeys("Duration", form, "int").(int),
+		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
 
@@ -218,7 +218,7 @@ func (quizController *QuizController) Create(ctx context.Context, req *web.Reque
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
 		Duration:        funcs.ValidateStringFormKeys("Duration", form, "int").(int),
-		CourseChapterID: funcs.ValidateStringFormKeys("Duration", form, "int").(int),
+		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
 

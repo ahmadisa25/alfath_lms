@@ -212,7 +212,6 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 			Message: "material Not Found!",
 		})
 	}
-	Update(
 	formError := req.Request().ParseForm()
 	if formError != nil {
 		return materialController.responder.HTTP(400, strings.NewReader(formError.Error()))
@@ -223,7 +222,7 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 	materialData := &models.ChapterMaterial{
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		FileUrl:     funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
+		FileUrl:         funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
 		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
