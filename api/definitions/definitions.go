@@ -1,5 +1,7 @@
 package definitions
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type GenericAPIMessage struct {
 	Status  int
 	Message string
@@ -8,6 +10,11 @@ type GenericAPIMessage struct {
 type GenericCreationMessage struct {
 	Status     int
 	InstanceID int
+}
+
+type GenericMongoCreationMessage struct {
+	Status     int
+	InstanceID primitive.ObjectID
 }
 
 type StringSlice []string

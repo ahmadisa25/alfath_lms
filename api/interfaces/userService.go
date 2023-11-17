@@ -2,8 +2,9 @@ package interfaces
 
 import (
 	"alfath_lms/api/definitions"
+	"alfath_lms/api/models"
 )
 
 type UserServiceInterface interface {
-	Create(data map[string]interface{}) (definitions.GenericCreationMessage, error)
+	Create(User models.User) (definitions.GenericMongoCreationMessage, error)
 }

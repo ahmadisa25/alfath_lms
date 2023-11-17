@@ -2,6 +2,8 @@ package funcs
 
 import (
 	"alfath_lms/api/definitions"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"reflect"
 	"strconv"
@@ -59,6 +61,17 @@ func GetStructField(value interface{}, fieldName string) interface{} {
 	}
 
 	return field.Interface()
+}
+
+func HashStringToSHA256(input string) string {
+	if input == "" {
+		return ""
+	} else {
+		hasher := sha256.New()
+		hasher.Write([]byte(input))
+		hashSum := hasher.Sum(nil)
+		return hex.EncodeToString(hashSum)
+	}
 }
 
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {

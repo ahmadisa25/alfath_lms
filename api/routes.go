@@ -15,6 +15,7 @@ type Routes struct {
 	courseController     controllers.CourseController
 	instructorController controllers.InstructorController
 	studentController    controllers.StudentController
+	userController       controllers.UserController
 }
 
 func (routes *Routes) Inject(
@@ -26,6 +27,7 @@ func (routes *Routes) Inject(
 	courseController *controllers.CourseController,
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
+	userController *controllers.UserController,
 ) {
 	routes.answerController = *answerController
 	routes.quizController = *quizController
@@ -35,6 +37,7 @@ func (routes *Routes) Inject(
 	routes.instructorController = *instructorController
 	routes.studentController = *studentController
 	routes.questionController = *questionController
+	routes.userController = *userController
 }
 
 func (routes *Routes) Routes(registry *web.RouterRegistry) {
@@ -99,6 +102,14 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.HandleGet("quiz-answer", routes.answerController.Get)
 	registry.HandleDelete("quiz-answer", routes.answerController.Delete)
 	registry.HandlePut("quiz-answer", routes.answerController.Update)
+
+	registry.Route("/user/", "user")
+	registry.HandlePost("user", routes.userController.Create)
+
+	/*registry.Route("/user/:id", "user")
+	registry.HandleGet("user", routes.userController.Get)
+	registry.HandleDelete("user", routes.userController.Delete)
+	registry.HandlePut("user", routes.userController.Update)*/
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", routes.studentController.Get)
