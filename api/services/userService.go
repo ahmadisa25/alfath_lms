@@ -19,10 +19,22 @@ func (userSvc *UserService) Inject(mongo *mongo.Database) {
 	userSvc.mongo = mongo
 }
 
-func (userSvc *UserService) Create(User models.User) (definitions.GenericMongoCreationMessage, error) {
+func (userSvc *UserService) Create(User models.User, Role string) (definitions.GenericMongoCreationMessage, error) {
 	filter := bson.D{{"email", User.Email}}
 	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
+		filter = bson.D{{"name", Role}}
+		roleSearch := userSvc.mongo.Collection("roles").FindOne(context.TODO(), filter)
+
+		if roleSearch.Err() == mongo.ErrNoDocuments {
+			return definitions.GenericMongoCreationMessage{}, errors.New("role doesn't exist")
+		} else if roleSearch.Err() != nil {
+			return definitions.GenericMongoCreationMessage{}, roleSearch.Err()
+		}
+		var role models.Role
+		roleSearch.Decode(&role)
+		User.Role = role
+
 		insertResult, err := userSvc.mongo.Collection("users").InsertOne(context.TODO(), User)
 
 		if err != nil {

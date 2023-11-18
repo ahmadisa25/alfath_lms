@@ -6,5 +6,5 @@ import (
 )
 
 type UserServiceInterface interface {
-	Create(User models.User) (definitions.GenericMongoCreationMessage, error)
+	Create(User models.User, Role string) (definitions.GenericMongoCreationMessage, error)
 }

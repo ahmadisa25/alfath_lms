@@ -46,6 +46,7 @@ func (userController *UserController) Create(ctx context.Context, req *web.Reque
 		Email:       funcs.ValidateStringFormKeys("Email", form, "string").(string),
 		MobilePhone: funcs.ValidateStringFormKeys("MobilePhone", form, "string").(string),
 		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Time{},
 	}
 
 	validateError := userController.customValidator.Validate.Struct(user)
@@ -61,13 +62,27 @@ func (userController *UserController) Create(ctx context.Context, req *web.Reque
 
 	if user.Password != "" {
 		if len(user.Password) < 8 {
-			return userController.responder.HTTP(400, strings.NewReader("Passwords must have a minimum length of 8 characters!"))
+			errorResponse, packError := funcs.ErrorPackaging("Password must have a minimum length of 8 characters!", 400)
+			if packError != nil {
+				return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			}
+			return userController.responder.HTTP(400, strings.NewReader(errorResponse))
 		} else {
 			user.Password = funcs.HashStringToSHA256(user.Password)
 		}
 	}
 
-	result, err := userController.userService.Create(*user)
+	role := funcs.ValidateStringFormKeys("RoleName", form, "string").(string)
+
+	if role == "" {
+		errorResponse, packError := funcs.ErrorPackaging("Role must be selected!", 400)
+		if packError != nil {
+			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+	}
+
+	result, err := userController.userService.Create(*user, role)
 	if err != nil {
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
