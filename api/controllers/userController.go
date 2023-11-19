@@ -8,10 +8,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
 	"flamingo.me/flamingo/v3/framework/web"
+	"github.com/golang-jwt/jwt"
 )
 
 type (
@@ -19,6 +21,12 @@ type (
 		responder       *web.Responder
 		customValidator *validator.CustomValidator
 		userService     interfaces.UserServiceInterface
+	}
+
+	LoginResponse struct {
+		Status  int
+		Message string
+		Token   string
 	}
 )
 
@@ -69,6 +77,31 @@ func (userController *UserController) Login(ctx context.Context, req *web.Reques
 			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
 		return userController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	if result.Status == 200 {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"email": data["Email"],
+		})
+
+		parsedToken, tokenErr := token.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+		if tokenErr != nil {
+			return userController.responder.HTTP(400, strings.NewReader(tokenErr.Error()))
+		}
+
+		resp := LoginResponse{
+			Status:  200,
+			Message: "Login Success",
+			Token:   parsedToken,
+		}
+
+		res, resErr := json.Marshal(resp)
+		if resErr != nil {
+			return userController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		}
+
+		return userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
 	}
 
 	res, resErr := json.Marshal(result)
