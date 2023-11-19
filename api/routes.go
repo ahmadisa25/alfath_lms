@@ -106,10 +106,8 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/user/", "user")
 	registry.HandlePost("user", routes.userController.Create)
 
-	/*registry.Route("/user/:id", "user")
-	registry.HandleGet("user", routes.userController.Get)
-	registry.HandleDelete("user", routes.userController.Delete)
-	registry.HandlePut("user", routes.userController.Update)*/
+	registry.Route("/login/", "login")
+	registry.HandlePost("login", routes.userController.Login)
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", routes.studentController.Get)

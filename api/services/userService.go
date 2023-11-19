@@ -2,6 +2,7 @@ package services
 
 import (
 	"alfath_lms/api/definitions"
+	"alfath_lms/api/funcs"
 	"alfath_lms/api/models"
 	"context"
 	"errors"
@@ -17,6 +18,37 @@ type UserService struct {
 
 func (userSvc *UserService) Inject(mongo *mongo.Database) {
 	userSvc.mongo = mongo
+}
+
+func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.GenericAPIMessage, error) {
+	filter := bson.D{{"email", Data["Email"].(string)}}
+	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
+	if searchResult.Err() == mongo.ErrNoDocuments {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Wrong username or password",
+		}, nil
+	} else if searchResult.Err() != nil {
+		return definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "there's an error in processing your request. Please try again later",
+		}, nil
+	} else {
+		var existingUser models.User
+		searchResult.Decode(&existingUser)
+
+		if existingUser.Password != funcs.HashStringToSHA256(Data["Password"].(string)) {
+			return definitions.GenericAPIMessage{
+				Status:  400,
+				Message: "Wrong username or password",
+			}, nil
+		} else {
+			return definitions.GenericAPIMessage{
+				Status:  200,
+				Message: "Login Success",
+			}, nil
+		}
+	}
 }
 
 func (userSvc *UserService) Create(User models.User, Role string) (definitions.GenericMongoCreationMessage, error) {

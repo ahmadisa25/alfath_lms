@@ -32,6 +32,53 @@ func (userController *UserController) Inject(
 	userController.userService = userService
 }
 
+func (userController *UserController) Login(ctx context.Context, req *web.Request) web.Result {
+	formError := req.Request().ParseForm()
+	if formError != nil {
+		return userController.responder.HTTP(400, strings.NewReader(formError.Error()))
+	}
+
+	form := req.Request().Form
+
+	data := map[string]interface{}{
+		"Password": funcs.ValidateStringFormKeys("Password", form, "string").(string),
+		"Email":    funcs.ValidateStringFormKeys("Email", form, "string").(string),
+	}
+
+	if data["Email"] == "" {
+		errorResponse, packError := funcs.ErrorPackaging("Please type in e-mail!", 400)
+		if packError != nil {
+			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+	}
+
+	if data["Password"] == "" {
+		errorResponse, packError := funcs.ErrorPackaging("Please type in password!", 400)
+		if packError != nil {
+			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+	}
+
+	result, err := userController.userService.Login(data)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return userController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return userController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+}
+
 func (userController *UserController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
