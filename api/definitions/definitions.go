@@ -7,6 +7,12 @@ type GenericAPIMessage struct {
 	Message string
 }
 
+type LoginResponse struct {
+	Status  int
+	Message string
+	Token   string
+}
+
 type GenericCreationMessage struct {
 	Status     int
 	InstanceID int
