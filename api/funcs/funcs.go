@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func IsStringArrayItemExists(needle string, haystack []string) bool {
+func ArrayExists[T comparable](needle T, haystack []T) bool {
 
 	for _, element := range haystack {
 		if needle == element {

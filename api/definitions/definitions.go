@@ -7,6 +7,11 @@ type GenericAPIMessage struct {
 	Message string
 }
 
+type GenericGetMessage[T any] struct {
+	Status int
+	Data   T
+}
+
 type LoginResponse struct {
 	Status  int
 	Message string

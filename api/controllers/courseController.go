@@ -22,11 +22,6 @@ type (
 		customValidator *validator.CustomValidator
 		courseService   interfaces.CourseServiceInterface
 	}
-
-	GetCourseResponse struct {
-		Status int
-		Data   models.Course
-	}
 )
 
 func (courseController *CourseController) Inject(
@@ -102,7 +97,7 @@ func (courseController *CourseController) Get(ctx context.Context, req *web.Requ
 		})
 	}
 
-	return courseController.responder.Data(GetCourseResponse{
+	return courseController.responder.Data(definitions.GenericGetMessage[models.Course]{
 		Status: 200,
 		Data:   course,
 	})
