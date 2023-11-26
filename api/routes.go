@@ -2,6 +2,8 @@ package api
 
 import (
 	"alfath_lms/api/controllers"
+	"alfath_lms/api/middleware"
+	"context"
 
 	"flamingo.me/flamingo/v3/framework/web"
 )
@@ -16,6 +18,8 @@ type Routes struct {
 	instructorController controllers.InstructorController
 	studentController    controllers.StudentController
 	userController       controllers.UserController
+	authMdw              *middleware.AuthMiddleware
+	responder            *web.Responder
 }
 
 func (routes *Routes) Inject(
@@ -28,6 +32,7 @@ func (routes *Routes) Inject(
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
 	userController *controllers.UserController,
+	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
 	routes.quizController = *quizController
@@ -38,6 +43,10 @@ func (routes *Routes) Inject(
 	routes.studentController = *studentController
 	routes.questionController = *questionController
 	routes.userController = *userController
+	routes.authMdw = &middleware.AuthMiddleware{
+		Responder: responder,
+	}
+	routes.responder = responder
 }
 
 func (routes *Routes) Routes(registry *web.RouterRegistry) {
@@ -50,7 +59,9 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.HandlePost("instructor", routes.instructorController.Create)
 
 	registry.Route("/instructor-all/", "instructor-all")
-	registry.HandleGet("instructor-all", routes.instructorController.GetAll)
+	registry.HandleGet("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll)
+	})
 
 	registry.Route("/course-all/", "course-all")
 	registry.HandleGet("course-all", routes.courseController.GetAll)
