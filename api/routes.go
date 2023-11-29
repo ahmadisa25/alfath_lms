@@ -51,7 +51,9 @@ func (routes *Routes) Inject(
 
 func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/instructor/:id", "instructor")
-	registry.HandleGet("instructor", routes.instructorController.Get)
+	registry.HandleGet("instructor", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Get, "all")
+	})
 	registry.HandlePut("instructor", routes.instructorController.Update)
 	registry.HandleDelete("instructor", routes.instructorController.Delete)
 

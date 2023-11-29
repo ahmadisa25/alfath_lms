@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"alfath_lms/api/definitions"
 	"context"
 	"fmt"
 	"os"
@@ -20,7 +21,10 @@ func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, 
 
 	auth, authOk := headers["Authorization"]
 	if !authOk {
-		return authMdw.Responder.HTTP(401, strings.NewReader("Not authorized!"))
+		return authMdw.Responder.Data(definitions.GenericAPIMessage{
+			Status:  401,
+			Message: "Not authorized!",
+		})
 	} else {
 		auth := strings.Split(auth[0], " ")
 		token, err := jwt.Parse(auth[1], func(token *jwt.Token) (interface{}, error) {
@@ -34,14 +38,20 @@ func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, 
 		})
 
 		if err != nil {
-			return authMdw.Responder.HTTP(401, strings.NewReader("Not authorized!"))
+			return authMdw.Responder.Data(definitions.GenericAPIMessage{
+				Status:  401,
+				Message: "Not authorized!",
+			})
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if ok && token.Valid {
 			claimRole := claims["role_name"].(string)
 			if claimRole != prefferedRole && prefferedRole != "all" {
-				return authMdw.Responder.HTTP(401, strings.NewReader("Not authorized!"))
+				return authMdw.Responder.Data(definitions.GenericAPIMessage{
+					Status:  401,
+					Message: "Not authorized!",
+				})
 			}
 			req.Request().Header.Add("email", claims["email"].(string))
 			req.Request().Header.Add("role_name", claimRole)
