@@ -20,9 +20,10 @@ type GenericGetMessage[T any] struct {
 }
 
 type LoginResponse struct {
-	Status  int
-	Message string
-	Token   string
+	Status       int
+	Message      string
+	Token        string
+	RefreshToken string
 }
 
 type GenericCreationMessage struct {

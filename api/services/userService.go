@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -51,22 +52,41 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"email":     Data["Email"],
 				"role_name": existingUser.Role.Name,
+				"exp":       time.Now().Add(time.Minute * 60).Unix(),
 			})
 
 			parsedToken, tokenErr := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 
 			if tokenErr != nil {
 				return definitions.LoginResponse{
-					Status:  400,
-					Message: tokenErr.Error(),
-					Token:   "",
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+
+			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"email": Data["Email"],
+				"exp":   time.Now().Add(time.Hour * 24).Unix(),
+			})
+
+			parsedRefreshToken, tokenErr := refreshToken.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+			if tokenErr != nil {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
 				}, nil
 			}
 
 			return definitions.LoginResponse{
-				Status:  200,
-				Message: "Login Success",
-				Token:   parsedToken,
+				Status:       200,
+				Message:      "Login Success",
+				Token:        parsedToken,
+				RefreshToken: parsedRefreshToken,
 			}, nil
 		}
 	}
