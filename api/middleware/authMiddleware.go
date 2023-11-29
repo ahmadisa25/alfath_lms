@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"alfath_lms/api/definitions"
+	"alfath_lms/api/funcs"
 	"context"
 	"fmt"
 	"os"
@@ -15,7 +16,7 @@ type AuthMiddleware struct {
 	Responder *web.Responder
 }
 
-func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, action web.Action, prefferedRole string) web.Result {
+func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, action web.Action, prefferedRole []string) web.Result {
 	headers := req.Request().Header
 	//get path = login
 
@@ -47,11 +48,14 @@ func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if ok && token.Valid {
 			claimRole := claims["role_name"].(string)
-			if claimRole != prefferedRole && prefferedRole != "all" {
-				return authMdw.Responder.Data(definitions.GenericAPIMessage{
-					Status:  401,
-					Message: "Not authorized!",
-				})
+			if prefferedRole != nil {
+				if !funcs.ArrayExists(claimRole, prefferedRole) {
+					return authMdw.Responder.Data(definitions.GenericAPIMessage{
+						Status:  401,
+						Message: "Not authorized!",
+					})
+				}
+
 			}
 			req.Request().Header.Add("email", claims["email"].(string))
 			req.Request().Header.Add("role_name", claimRole)

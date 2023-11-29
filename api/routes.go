@@ -52,19 +52,19 @@ func (routes *Routes) Inject(
 func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/instructor/:id", "instructor")
 	registry.HandleGet("instructor", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Get, "all")
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Get, nil)
 	})
 	registry.HandlePut("instructor", routes.instructorController.Update)
 	registry.HandleDelete("instructor", routes.instructorController.Delete)
 
 	registry.Route("/instructor/", "instructor")
 	registry.HandlePost("instructor", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Create, "administrator")
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Create, []string{"administrator"})
 	})
 
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, "all")
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, nil)
 	})
 
 	registry.Route("/course-all/", "course-all")
