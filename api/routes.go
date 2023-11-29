@@ -56,11 +56,13 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.HandleDelete("instructor", routes.instructorController.Delete)
 
 	registry.Route("/instructor/", "instructor")
-	registry.HandlePost("instructor", routes.instructorController.Create)
+	registry.HandlePost("instructor", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Create, "administrator")
+	})
 
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll)
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, "all")
 	})
 
 	registry.Route("/course-all/", "course-all")

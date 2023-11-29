@@ -1,6 +1,13 @@
 package definitions
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"context"
+
+	"flamingo.me/flamingo/v3/framework/web"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type MiddlewareFunc func(ctx context.Context, req *web.Request, actionStack []web.Action) web.Result
 
 type GenericAPIMessage struct {
 	Status  int
