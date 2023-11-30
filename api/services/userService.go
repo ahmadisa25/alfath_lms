@@ -3,6 +3,7 @@ package services
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/funcs"
+	"alfath_lms/api/interfaces"
 	"alfath_lms/api/models"
 	"context"
 	"errors"
@@ -16,11 +17,19 @@ import (
 )
 
 type UserService struct {
-	mongo *mongo.Database
+	mongo         *mongo.Database
+	instructorSvc interfaces.InstructorServiceInterface
+	studentSvc    interfaces.StudentServiceInterface
 }
 
-func (userSvc *UserService) Inject(mongo *mongo.Database) {
+func (userSvc *UserService) Inject(
+	mongo *mongo.Database,
+	studentService interfaces.StudentServiceInterface,
+	instructorService interfaces.InstructorServiceInterface,
+) {
 	userSvc.mongo = mongo
+	userSvc.instructorSvc = instructorService
+	userSvc.studentSvc = studentService
 }
 
 func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.LoginResponse, error) {
@@ -112,6 +121,32 @@ func (userSvc *UserService) Create(User models.User, Role string) (definitions.G
 
 		if err != nil {
 			return definitions.GenericMongoCreationMessage{}, nil
+		}
+
+		if Role == "instructor" {
+			instructor := &models.Instructor{
+				Name:        User.Name,
+				Email:       User.Email,
+				MobilePhone: User.MobilePhone,
+				CreatedAt:   time.Now(),
+			}
+			_, err := userSvc.instructorSvc.CreateInstructor(*instructor)
+
+			if err != nil {
+				return definitions.GenericMongoCreationMessage{}, nil
+			}
+		} else if Role == "student" {
+			student := &models.Student{
+				Name:        User.Name,
+				Email:       User.Email,
+				MobilePhone: User.MobilePhone,
+				CreatedAt:   time.Now(),
+			}
+			_, err := userSvc.studentSvc.CreateStudent(*student)
+
+			if err != nil {
+				return definitions.GenericMongoCreationMessage{}, nil
+			}
 		}
 
 		return definitions.GenericMongoCreationMessage{

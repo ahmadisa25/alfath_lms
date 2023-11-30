@@ -69,7 +69,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.instructorControlroutes.chapterController.Updateler.GetAll, nil)
+		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, nil)
 	})
 
 	registry.Route("/course-all/", "course-all")
@@ -175,7 +175,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/user/", "user")
 	registry.HandlePost("user", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Create, []string{"administrator"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.userController.Create, []string{"administrator"})
 	})
 
 	registry.Route("/login/", "login")
@@ -198,6 +198,6 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/student-all/", "student-all")
 	registry.HandleGet("student-all", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.Get, []string{"administrator"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.GetAll, []string{"administrator"})
 	})
 }
