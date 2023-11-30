@@ -21,6 +21,7 @@ type (
 		responder         *web.Responder
 		customValidator   *validator.CustomValidator
 		instructorService interfaces.InstructorServiceInterface
+		userService       interfaces.UserServiceInterface
 	}
 
 	GetInstructorResponse struct {
@@ -33,10 +34,12 @@ func (instructorController *InstructorController) Inject(
 	responder *web.Responder,
 	customValidator *validator.CustomValidator,
 	instructorService interfaces.InstructorServiceInterface,
+	userService interfaces.UserServiceInterface,
 ) {
 	instructorController.responder = responder
 	instructorController.customValidator = customValidator
 	instructorController.instructorService = instructorService
+	instructorController.userService = userService
 }
 
 func (instructorController *InstructorController) Create(ctx context.Context, req *web.Request) web.Result {
@@ -170,6 +173,12 @@ func (instructorController *InstructorController) Delete(ctx context.Context, re
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
 		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	_, deleteUserErr := instructorController.userService.Delete(instructor.Email)
+
+	if deleteUserErr != nil {
+		return instructorController.responder.HTTP(400, strings.NewReader(deleteUserErr.Error()))
 	}
 
 	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
