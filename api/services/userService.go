@@ -159,6 +159,14 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 	} else {
 		var existingUser models.User
 		searchResult.Decode(&existingUser)
+		if existingUser.IsDeleted {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      "User doesn't exist",
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
 
 		if existingUser.Password != funcs.HashStringToSHA256(Data["Password"].(string)) {
 			return definitions.LoginResponse{
@@ -269,6 +277,7 @@ func (userSvc *UserService) Create(User models.User, Role string) (definitions.G
 		var role models.Role
 		roleSearch.Decode(&role)
 		User.Role = role
+		User.IsDeleted = false
 
 		insertResult, err := userSvc.mongo.Collection("users").InsertOne(context.TODO(), User)
 
