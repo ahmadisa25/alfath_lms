@@ -7,10 +7,12 @@ import (
 	"alfath_lms/api/models"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,16 +22,121 @@ type UserService struct {
 	mongo         *mongo.Database
 	instructorSvc interfaces.InstructorServiceInterface
 	studentSvc    interfaces.StudentServiceInterface
+	redis         *redis.Client
 }
 
 func (userSvc *UserService) Inject(
 	mongo *mongo.Database,
 	studentService interfaces.StudentServiceInterface,
 	instructorService interfaces.InstructorServiceInterface,
+	redis *redis.Client,
 ) {
 	userSvc.mongo = mongo
 	userSvc.instructorSvc = instructorService
 	userSvc.studentSvc = studentService
+	userSvc.redis = redis
+}
+
+func (userSvc *UserService) Refresh(Data map[string]interface{}) (definitions.LoginResponse, error) {
+
+	token, err := jwt.Parse(Data["RefreshToken"].(string), func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return "Not authorized!", nil
+		}
+
+		return []byte(os.Getenv("JWT_KEY")), nil //Parse function must return a key. remember it's called the "Keyfunc".
+	})
+
+	if err != nil {
+		return definitions.LoginResponse{}, nil
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
+		storedToken, err := userSvc.redis.Get(context.Background(), "refresh_token_"+claims["email"].(string)).Result()
+
+		fmt.Println(storedToken)
+
+		if err != nil {
+			return definitions.LoginResponse{
+				Status:       500,
+				Message:      err.Error(),
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		if storedToken != Data["RefreshToken"].(string) {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      "Wrong data supplied",
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"email":     claims["email"],
+			"role_name": claims["role_name"],
+			"exp":       time.Now().Add(time.Minute * 60).Unix(),
+		})
+
+		parsedToken, tokenErr := token.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+		if tokenErr != nil {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      tokenErr.Error(),
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"email":     claims["email"],
+			"role_name": claims["role_name"],
+			"exp":       time.Now().Add(time.Hour * 24).Unix(),
+		})
+
+		parsedRefreshToken, tokenErr := refreshToken.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+		if tokenErr != nil {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      tokenErr.Error(),
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		userEmail := claims["email"].(string)
+		redisKey := "refresh_token_" + userEmail
+		redisErr := userSvc.redis.Set(context.Background(), redisKey, parsedRefreshToken, 24*time.Hour).Err()
+
+		if redisErr != nil {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      tokenErr.Error(),
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		return definitions.LoginResponse{
+			Status:       200,
+			Message:      "Login Success",
+			Token:        parsedToken,
+			RefreshToken: parsedRefreshToken,
+		}, nil
+	} else {
+		return definitions.LoginResponse{
+			Status:       400,
+			Message:      "Invalid refresh token",
+			Token:        "",
+			RefreshToken: "",
+		}, nil
+	}
 }
 
 func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.LoginResponse, error) {
@@ -37,15 +144,17 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
 		return definitions.LoginResponse{
-			Status:  400,
-			Message: "Wrong username or password",
-			Token:   "",
+			Status:       400,
+			Message:      "Wrong username or password",
+			Token:        "",
+			RefreshToken: "",
 		}, nil
 	} else if searchResult.Err() != nil {
 		return definitions.LoginResponse{
-			Status:  500,
-			Message: "there's an error in processing your request. Please try again later",
-			Token:   "",
+			Status:       500,
+			Message:      "there's an error in processing your request. Please try again later",
+			Token:        "",
+			RefreshToken: "",
 		}, nil
 	} else {
 		var existingUser models.User
@@ -53,9 +162,10 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 
 		if existingUser.Password != funcs.HashStringToSHA256(Data["Password"].(string)) {
 			return definitions.LoginResponse{
-				Status:  400,
-				Message: "Wrong username or password",
-				Token:   "",
+				Status:       400,
+				Message:      "Wrong username or password",
+				Token:        "",
+				RefreshToken: "",
 			}, nil
 		} else {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -76,13 +186,26 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			}
 
 			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-				"email": Data["Email"],
-				"exp":   time.Now().Add(time.Hour * 24).Unix(),
+				"email":     Data["Email"],
+				"role_name": existingUser.Role.Name,
+				"exp":       time.Now().Add(time.Hour * 24).Unix(),
 			})
 
 			parsedRefreshToken, tokenErr := refreshToken.SignedString([]byte(os.Getenv("JWT_KEY")))
 
 			if tokenErr != nil {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+
+			redisKey := "refresh_token_" + Data["Email"].(string)
+			err := userSvc.redis.Set(context.Background(), redisKey, parsedRefreshToken, 24*time.Hour).Err()
+
+			if err != nil {
 				return definitions.LoginResponse{
 					Status:       400,
 					Message:      tokenErr.Error(),

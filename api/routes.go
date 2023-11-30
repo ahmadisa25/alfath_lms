@@ -181,6 +181,9 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/login/", "login")
 	registry.HandlePost("login", routes.userController.Login)
 
+	registry.Route("/refresh/", "refresh")
+	registry.HandlePost("refresh", routes.userController.Refresh)
+
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.Get, nil)
