@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"flamingo.me/flamingo/v3/framework/web"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type (
@@ -257,6 +258,8 @@ func (instructorController *InstructorController) Update(ctx context.Context, re
 	if resErr != nil {
 		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
 	}
+
+	instructorController.userService.Update(instructorData.Email, []bson.E{{"email", instructorData.Email}, {"name", instructorData.Name}, {"mobilephone", instructorData.MobilePhone}})
 
 	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
 }

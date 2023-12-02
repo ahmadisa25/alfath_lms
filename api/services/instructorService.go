@@ -5,7 +5,6 @@ import (
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/models"
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -74,17 +73,18 @@ func (instructorSvc *InstructorService) UpdateInstructor(id int, instructor mode
 	}
 
 	instructorSvc.db.Where("Mobile_Phone = ?", instructor.MobilePhone).First(&instructorTemp)
-	if instructorTemp.MobilePhone != "" && existingInstructor.MobilePhone != instructor.MobilePhone {
+	if instructorTemp.MobilePhone != "" && existingInstructor.MobilePhone == instructor.MobilePhone {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Instructor with that mobile phone already exists!",
 		}, nil
 	}
 	result := instructorSvc.db.Model(&instructorTemp).Where("id = ?", id).Updates(&instructor)
-	fmt.Println(*result)
+
 	if result.Error != nil {
 		return definitions.GenericAPIMessage{}, result.Error
 	}
+
 	return definitions.GenericAPIMessage{
 		Status:  200,
 		Message: "Instructor is successfully updated",

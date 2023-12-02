@@ -74,7 +74,7 @@ func (studentSvc *StudentService) UpdateStudent(id int, student models.Student, 
 	}
 
 	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
-	if studentTemp.MobilePhone != "" && existingStudent.MobilePhone != student.MobilePhone {
+	if studentTemp.MobilePhone != "" && existingStudent.MobilePhone == student.MobilePhone {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Student with that mobile phone already exists!",

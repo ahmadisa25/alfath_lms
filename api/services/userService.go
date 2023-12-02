@@ -232,6 +232,36 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 	}
 }
 
+func (userSvc *UserService) Update(Email string, Updates []bson.E) (definitions.GenericAPIMessage, error) {
+	filter := bson.D{{"email", Email}}
+	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
+	if searchResult.Err() == mongo.ErrNoDocuments {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "User not found",
+		}, nil
+	} else if searchResult.Err() != nil {
+		return definitions.GenericAPIMessage{
+			Status:  500,
+			Message: searchResult.Err().Error(),
+		}, nil
+	} else {
+		_, err := userSvc.mongo.Collection("users").UpdateOne(context.TODO(), filter, bson.D{{"$set", Updates}})
+
+		if err != nil {
+			return definitions.GenericAPIMessage{
+				Status:  500,
+				Message: err.Error(),
+			}, nil
+		}
+
+		return definitions.GenericAPIMessage{
+			Status:  200,
+			Message: "User is successfully updated",
+		}, nil
+	}
+}
+
 func (userSvc *UserService) Delete(Email string) (definitions.GenericAPIMessage, error) {
 	filter := bson.D{{"email", Email}}
 	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
