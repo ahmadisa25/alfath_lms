@@ -9,17 +9,18 @@ import (
 )
 
 type Routes struct {
-	questionController   controllers.QuestionController
-	quizController       controllers.QuizController
-	answerController     controllers.AnswerController
-	materialController   controllers.MaterialController
-	chapterController    controllers.ChapterController
-	courseController     controllers.CourseController
-	instructorController controllers.InstructorController
-	studentController    controllers.StudentController
-	userController       controllers.UserController
-	authMdw              *middleware.AuthMiddleware
-	responder            *web.Responder
+	questionController     controllers.QuestionController
+	quizController         controllers.QuizController
+	answerController       controllers.AnswerController
+	materialController     controllers.MaterialController
+	chapterController      controllers.ChapterController
+	courseController       controllers.CourseController
+	instructorController   controllers.InstructorController
+	studentController      controllers.StudentController
+	userController         controllers.UserController
+	announcementController controllers.AnnouncementController
+	authMdw                *middleware.AuthMiddleware
+	responder              *web.Responder
 }
 
 func (routes *Routes) Inject(
@@ -32,6 +33,7 @@ func (routes *Routes) Inject(
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
 	userController *controllers.UserController,
+	announcementController *controllers.AnnouncementController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
@@ -43,6 +45,7 @@ func (routes *Routes) Inject(
 	routes.studentController = *studentController
 	routes.questionController = *questionController
 	routes.userController = *userController
+	routes.announcementController = *announcementController
 	routes.authMdw = &middleware.AuthMiddleware{
 		Responder: responder,
 	}
@@ -183,6 +186,11 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/refresh/", "refresh")
 	registry.HandlePost("refresh", routes.userController.Refresh)
+
+	registry.Route("/announcement/", "announcement")
+	registry.HandlePost("announcement", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Create, []string{"administrator"})
+	})
 
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", func(ctx context.Context, req *web.Request) web.Result {
