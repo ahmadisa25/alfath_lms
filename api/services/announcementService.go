@@ -33,16 +33,58 @@ func (announcementSvc *AnnouncementService) Create(Announcement models.Announcem
 	}, nil
 }
 
-func (materialSvc *MaterialService) Update(id int, material models.ChapterMaterial) (definitions.GenericAPIMessage, error) {
-	var materialTemp models.ChapterMaterial
-	result := materialSvc.db.Model(&materialTemp).Where("id = ?", id).Updates(&material)
-	if result.Error != nil {
-		return definitions.GenericAPIMessage{}, result.Error
+func (announcementSvc *AnnouncementService) Get(id primitive.ObjectID) (definitions.GenericGetMessage[models.Announcement], error) {
+	filter := bson.M{"_id": id}
+	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
+	if searchResult.Err() == mongo.ErrNoDocuments {
+		return definitions.GenericGetMessage[models.Announcement]{
+			Status: 500,
+			Data:   models.Announcement{},
+		}, nil
+	} else if searchResult.Err() != nil {
+		return definitions.GenericGetMessage[models.Announcement]{
+			Status: 500,
+			Data:   models.Announcement{},
+		}, nil
+	} else {
+		var existingAnnouncement models.Announcement
+		searchResult.Decode(&existingAnnouncement)
+
+		return definitions.GenericGetMessage[models.Announcement]{
+			Status: 200,
+			Data:   existingAnnouncement,
+		}, nil
 	}
-	return definitions.GenericAPIMessage{
-		Status:  200,
-		Message: "material is successfully updated",
-	}, nil
+}
+
+func (announcementSvc *AnnouncementService) Update(id primitive.ObjectID, Announcement models.Announcement, existingAnnouncement models.Announcement) (definitions.GenericAPIMessage, error) {
+	filter := bson.M{"_id": id}
+	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
+	if searchResult.Err() == mongo.ErrNoDocuments {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "User not found",
+		}, nil
+	} else if searchResult.Err() != nil {
+		return definitions.GenericAPIMessage{
+			Status:  500,
+			Message: searchResult.Err().Error(),
+		}, nil
+	} else {
+		_, err := announcementSvc.mongo.Collection("announcement").UpdateOne(context.TODO(), filter, bson.D{{"$set", Updates}})
+
+		if err != nil {
+			return definitions.GenericAPIMessage{
+				Status:  500,
+				Message: err.Error(),
+			}, nil
+		}
+
+		return definitions.GenericAPIMessage{
+			Status:  200,
+			Message: "Announcement is successfully updated",
+		}, nil
+	}
 }
 
 func (announcementSvc *AnnouncementService) Delete(id primitive.ObjectID) (definitions.GenericAPIMessage, error) {
@@ -83,7 +125,7 @@ func (announcementSvc *AnnouncementService) Delete(id primitive.ObjectID) (defin
 	}
 }
 
-func (materialSvc *MaterialService) Get(id int) (models.ChapterMaterial, error) {
+/*func (materialSvc *MaterialService) Get(id int) (models.ChapterMaterial, error) {
 	var material models.ChapterMaterial
 
 	result := &material
@@ -91,4 +133,4 @@ func (materialSvc *MaterialService) Get(id int) (models.ChapterMaterial, error) 
 
 	return *result, nil
 
-}
+}*/
