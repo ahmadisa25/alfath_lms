@@ -57,7 +57,7 @@ func (announcementSvc *AnnouncementService) Get(id primitive.ObjectID) (definiti
 	}
 }
 
-func (announcementSvc *AnnouncementService) Update(id primitive.ObjectID, Announcement models.Announcement, existingAnnouncement models.Announcement) (definitions.GenericAPIMessage, error) {
+func (announcementSvc *AnnouncementService) Update(id primitive.ObjectID, Updates []bson.E) (definitions.GenericAPIMessage, error) {
 	filter := bson.M{"_id": id}
 	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
