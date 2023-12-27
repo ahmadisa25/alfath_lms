@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"reflect"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ArrayExists[T comparable](needle T, haystack []T) bool {
@@ -98,6 +100,15 @@ func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType st
 		return res
 	}
 	return key[0]
+}
+
+func StringToMongoOID(s string) primitive.ObjectID {
+	objID, err := primitive.ObjectIDFromHex(s)
+	if err != nil {
+		return primitive.NilObjectID
+	} else {
+		return objID
+	}
 }
 
 func ValidateStringParamKeys(mapKey string, form map[string]string, dataType string) interface{} {

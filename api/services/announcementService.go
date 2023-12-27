@@ -3,6 +3,7 @@ package services
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/pagination"
+	"alfath_lms/api/funcs"
 	"alfath_lms/api/models"
 	"context"
 
@@ -57,13 +58,13 @@ func (announcementSvc *AnnouncementService) Get(id primitive.ObjectID) (definiti
 	}
 }
 
-func (announcementSvc *AnnouncementService) Update(id primitive.ObjectID, Updates []bson.E) (definitions.GenericAPIMessage, error) {
+func (announcementSvc *AnnouncementService) Update(id string, Updates []bson.E) (definitions.GenericAPIMessage, error) {
 	filter := bson.M{"_id": id}
 	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
 		return definitions.GenericAPIMessage{
 			Status:  400,
-			Message: "User not found",
+			Message: "Announcement not found",
 		}, nil
 	} else if searchResult.Err() != nil {
 		return definitions.GenericAPIMessage{
@@ -87,14 +88,22 @@ func (announcementSvc *AnnouncementService) Update(id primitive.ObjectID, Update
 	}
 }
 
-func (announcementSvc *AnnouncementService) Delete(id primitive.ObjectID) (definitions.GenericAPIMessage, error) {
+func (announcementSvc *AnnouncementService) Delete(id string) (definitions.GenericAPIMessage, error) {
 	//delete here means soft delete
-	filter := bson.M{"_id": id}
+	objID := funcs.StringToMongoOID(id)
+	if objID == primitive.NilObjectID {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Announcement not found",
+		}, nil
+	}
+	filter := bson.M{"_id": objID}
+
 	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
 		return definitions.GenericAPIMessage{
 			Status:  400,
-			Message: "User not found",
+			Message: "Announcement not found",
 		}, nil
 	} else if searchResult.Err() != nil {
 		return definitions.GenericAPIMessage{

@@ -192,6 +192,11 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Create, []string{"administrator"})
 	})
 
+	registry.Route("/announcement/:id", "announcement")
+	registry.HandleDelete("announcement", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Delete, []string{"administrator"})
+	})
+
 	registry.Route("/student/:id", "student")
 	registry.HandleGet("student", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.Get, nil)

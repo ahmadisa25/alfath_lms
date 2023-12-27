@@ -13,5 +13,5 @@ type Announcement struct {
 	FileUrl     string             `json:"FileUrl,omitempty"`
 	CreatedAt   time.Time          `json:"CreatedAt,omitempty"`
 	UpdatedAt   time.Time          `json:"UpdatedAt,omitempty"`
-	DeletedAt   time.Time          `json:"DeletedAt,omitempty"`
+	//DeletedAt   time.Time          `json:"DeletedAt,omitempty"`
 }
