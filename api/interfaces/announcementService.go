@@ -11,7 +11,7 @@ import (
 type AnnouncementServiceInterface interface {
 	//	GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error)
 	Get(id primitive.ObjectID) (definitions.GenericGetMessage[models.Announcement], error)
-	Delete(id primitive.ObjectID) (definitions.GenericAPIMessage, error)
+	Delete(id string) (definitions.GenericAPIMessage, error)
 	Create(Announcement models.Announcement) (definitions.GenericMongoCreationMessage, error)
-	Update(id primitive.ObjectID, Updates []bson.E) (definitions.GenericAPIMessage, error)
+	Update(id string, Updates []bson.E) (definitions.GenericAPIMessage, error)
 }
