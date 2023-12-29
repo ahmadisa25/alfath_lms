@@ -193,6 +193,9 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	})
 
 	registry.Route("/announcement/:id", "announcement")
+	registry.HandlePut("announcement", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Update, []string{"administrator"})
+	})
 	registry.HandleDelete("announcement", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Delete, []string{"administrator"})
 	})

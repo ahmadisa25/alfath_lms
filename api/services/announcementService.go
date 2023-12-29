@@ -34,8 +34,15 @@ func (announcementSvc *AnnouncementService) Create(Announcement models.Announcem
 	}, nil
 }
 
-func (announcementSvc *AnnouncementService) Get(id primitive.ObjectID) (definitions.GenericGetMessage[models.Announcement], error) {
-	filter := bson.M{"_id": id}
+func (announcementSvc *AnnouncementService) Get(id string) (definitions.GenericGetMessage[models.Announcement], error) {
+	objID := funcs.StringToMongoOID(id)
+	if objID == primitive.NilObjectID {
+		return definitions.GenericGetMessage[models.Announcement]{
+			Status: 500,
+			Data:   models.Announcement{},
+		}, nil
+	}
+	filter := bson.M{"_id": objID}
 	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
 		return definitions.GenericGetMessage[models.Announcement]{
@@ -59,7 +66,14 @@ func (announcementSvc *AnnouncementService) Get(id primitive.ObjectID) (definiti
 }
 
 func (announcementSvc *AnnouncementService) Update(id string, Updates []bson.E) (definitions.GenericAPIMessage, error) {
-	filter := bson.M{"_id": id}
+	objID := funcs.StringToMongoOID(id)
+	if objID == primitive.NilObjectID {
+		return definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Announcement not found",
+		}, nil
+	}
+	filter := bson.M{"_id": objID}
 	searchResult := announcementSvc.mongo.Collection("announcement").FindOne(context.TODO(), filter)
 	if searchResult.Err() == mongo.ErrNoDocuments {
 		return definitions.GenericAPIMessage{
