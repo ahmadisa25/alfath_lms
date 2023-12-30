@@ -187,6 +187,11 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/refresh/", "refresh")
 	registry.HandlePost("refresh", routes.userController.Refresh)
 
+	registry.Route("/announcement-all/", "announcement-all")
+	registry.HandleGet("announcement-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.GetAll, []string{"administrator"})
+	})
+
 	registry.Route("/announcement/", "announcement")
 	registry.HandlePost("announcement", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Create, []string{"administrator"})

@@ -22,6 +22,16 @@ func (announcementSvc *AnnouncementService) Inject(mongo *mongo.Database, pagina
 	announcementSvc.paginator = paginator
 }
 
+func (announcementSvc *AnnouncementService) GetAll(limit int, page int) (definitions.PaginationResult, error) {
+	return definitions.PaginationResult{
+		Data:    announcementSvc.mongo.Collection("announcement").find().skip(page*limit - limit).limit(limit),
+		Page:    page,
+		PerPage: limit,
+		Total:   0,
+		Status:  200,
+	}, nil
+}
+
 func (announcementSvc *AnnouncementService) Create(Announcement models.Announcement) (definitions.GenericMongoCreationMessage, error) {
 	insertResult, err := announcementSvc.mongo.Collection("announcement").InsertOne(context.TODO(), Announcement)
 

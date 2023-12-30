@@ -8,7 +8,7 @@ import (
 )
 
 type AnnouncementServiceInterface interface {
-	//	GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error)
+	GetAll(limit int, page int) (definitions.PaginationResult, error)
 	Get(id string) (definitions.GenericGetMessage[models.Announcement], error)
 	Delete(id string) (definitions.GenericAPIMessage, error)
 	Create(Announcement models.Announcement) (definitions.GenericMongoCreationMessage, error)
