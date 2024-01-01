@@ -6,10 +6,13 @@ import (
 	"alfath_lms/api/funcs"
 	"alfath_lms/api/models"
 	"context"
+	"strconv"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type AnnouncementService struct {
@@ -22,12 +25,68 @@ func (announcementSvc *AnnouncementService) Inject(mongo *mongo.Database, pagina
 	announcementSvc.paginator = paginator
 }
 
-func (announcementSvc *AnnouncementService) GetAll(limit int, page int) (definitions.PaginationResult, error) {
+func (announcementSvc *AnnouncementService) GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
+	mapResult := make(map[int]interface{})
+	filter := bson.M{}
+	if req.Page == "" || req.Page == "0" {
+		req.Page = "1"
+	}
+
+	if req.PerPage == "" || req.PerPage == "0" {
+		req.PerPage = "10"
+	}
+
+	limit, err := strconv.Atoi(req.PerPage)
+
+	if err != nil {
+		return definitions.PaginationResult{}, err
+	}
+
+	page, err := strconv.Atoi(req.Page)
+
+	if err != nil {
+		return definitions.PaginationResult{}, err
+	}
+
+	if req.Filter != "" {
+		//conditions := []bson.M{}
+		filters := strings.Split(req.Filter, ",")
+		for _, value := range filters {
+			filterKey := strings.Split(value, ":")
+
+			filter[filterKey[0]] = bson.M{"$regex": "^" + filterKey[1], "$options": "i"}
+		}
+
+		//filter = bson.M{"$or": conditions}
+	}
+
+	//fmt.Println(filter)
+
+	findOptions := options.Find()
+	findOptions.SetSkip(int64(page*limit - limit))
+	findOptions.SetLimit(int64(limit))
+	ctx := context.TODO()
+	anouncementCursor, err := announcementSvc.mongo.Collection("announcement").Find(ctx, filter, findOptions)
+
+	if err != nil {
+		return definitions.PaginationResult{}, err
+	}
+
+	defer anouncementCursor.Close(ctx)
+
+	i := 0
+	for anouncementCursor.Next(ctx) {
+		var res models.Announcement
+		anouncementCursor.Decode(&res)
+		mapResult[i] = res
+		i++
+	}
+
 	return definitions.PaginationResult{
-		Data:    announcementSvc.mongo.Collection("announcement").find().skip(page*limit - limit).limit(limit),
+		Data:    mapResult,
 		Page:    page,
 		PerPage: limit,
-		Total:   0,
+		Total:   int64(i),
 		Status:  200,
 	}, nil
 }

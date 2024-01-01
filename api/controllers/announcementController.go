@@ -80,6 +80,35 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 
 }
 
+func (announcementController *AnnouncementController) GetAll(ctx context.Context, req *web.Request) web.Result {
+	query := req.QueryAll()
+	paginationReq := definitions.PaginationRequest{
+		SelectedColumns: funcs.ValidateStringFormKeys("select", query, "string").(string),
+		Search:          funcs.ValidateStringFormKeys("search", query, "string").(string),
+		Page:            funcs.ValidateStringFormKeys("page", query, "string").(string),
+		PerPage:         funcs.ValidateStringFormKeys("perpage", query, "string").(string),
+		OrderBy:         funcs.ValidateStringFormKeys("order", query, "string").(string),
+		Filter:          funcs.ValidateStringFormKeys("filter", query, "string").(string),
+	}
+
+	result, err := announcementController.announcementService.GetAll(paginationReq)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+		}
+		return announcementController.responder.HTTP(500, strings.NewReader(errorResponse))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return announcementController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+	}
+
+	return announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+}
+
 func (announcementController *AnnouncementController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return announcementController.responder.Data(definitions.GenericAPIMessage{

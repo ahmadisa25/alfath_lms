@@ -189,7 +189,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/announcement-all/", "announcement-all")
 	registry.HandleGet("announcement-all", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.GetAll, []string{"administrator"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.GetAll, nil)
 	})
 
 	registry.Route("/announcement/", "announcement")
