@@ -46,7 +46,7 @@ func (instructorController *InstructorController) Inject(
 func (instructorController *InstructorController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -277,19 +277,18 @@ func (instructorController *InstructorController) GetAll(ctx context.Context, re
 
 	result, err := instructorController.instructorService.GetAllInstructors(paginationReq)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
-		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }

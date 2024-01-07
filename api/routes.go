@@ -19,6 +19,7 @@ type Routes struct {
 	studentController      controllers.StudentController
 	userController         controllers.UserController
 	announcementController controllers.AnnouncementController
+	optionsHandler         controllers.OptionsHandler
 	authMdw                *middleware.AuthMiddleware
 	responder              *web.Responder
 }
@@ -33,10 +34,12 @@ func (routes *Routes) Inject(
 	instructorController *controllers.InstructorController,
 	studentController *controllers.StudentController,
 	userController *controllers.UserController,
+	optionsHandler *controllers.OptionsHandler,
 	announcementController *controllers.AnnouncementController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
+	routes.optionsHandler = *optionsHandler
 	routes.quizController = *quizController
 	routes.materialController = *materialController
 	routes.courseController = *courseController
@@ -75,6 +78,10 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, nil)
 	})
 
+	registry.HandleOptions("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
 	registry.Route("/course-all/", "course-all")
 	registry.HandleGet("course-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.courseController.GetAll, nil)
@@ -89,6 +96,7 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.HandleGet("course", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.courseController.Get, nil)
 	})
+
 	registry.HandleDelete("course", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.courseController.Delete, []string{"administrator", "instructor"})
 	})

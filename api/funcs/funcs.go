@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"flamingo.me/flamingo/v3/framework/web"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -126,6 +127,11 @@ func ValidateStringParamKeys(mapKey string, form map[string]string, dataType str
 	}
 
 	return key[0]
+}
+
+func CorsedResponse(resp *web.Response) *web.Response {
+	resp.Header.Add("Access-Control-Allow-Origin", "*")
+	return resp
 }
 
 func ValidateOrOverwriteStringFormKeys(mapKey string, form map[string][]string, dataType string, input interface{}) interface{} {

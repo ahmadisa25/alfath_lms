@@ -17,6 +17,10 @@ type AuthMiddleware struct {
 }
 
 func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, action web.Action, prefferedRole []string) web.Result {
+	if req.Request().Method == "OPTIONS" {
+		//w := new http.ResponseWriter()
+		return action(ctx, req)
+	}
 	headers := req.Request().Header
 	//get path = login
 
