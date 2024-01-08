@@ -65,9 +65,9 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return instructorController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := instructorController.instructorService.CreateInstructor(*instructor)
@@ -75,17 +75,17 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return instructorController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return instructorController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return instructorController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(instructorController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(instructorController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 

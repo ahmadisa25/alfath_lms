@@ -73,6 +73,10 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.Create, []string{"administrator"})
 	})
 
+	registry.HandleOptions("instructor", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
 	registry.Route("/instructor-all/", "instructor-all")
 	registry.HandleGet("instructor-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.instructorController.GetAll, nil)
