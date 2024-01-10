@@ -34,7 +34,7 @@ func (instructorSvc *InstructorService) GetAllInstructors(req definitions.Pagina
 			"mobile_phone": "foo.mobile_phone",
 			"deleted_at":   "foo.deleted_at",
 		},
-		StaticFilterFields: map[string]bool{
+		NullFilterFields: map[string]bool{
 			"deleted_at": true,
 		},
 	}

@@ -75,7 +75,6 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		} else {
 			whereClause = whereClause + " and "
 		}
-
 		filters := strings.Split(req.Filter, ",")
 		for _, value := range filters {
 			filterKey := strings.Split(value, ":")
@@ -86,11 +85,13 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 			}
 
 			strIdx := strconv.Itoa(idx)
-			if prm.StaticFilterFields[keyName] {
-				whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") = @filter_value" + strIdx + ""
+			if prm.NullFilterFields[keyName] {
+				whereClause = whereClause + prm.FilterFields[keyName] + " IS NULL "
+			} else {
+				whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") like lower(@filter_value" + strIdx + ")"
+				whereParams["filter_value"+strIdx] = "%" + filterKey[1] + "%"
 			}
-			whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") like lower(@filter_value" + strIdx + ")"
-			whereParams["filter_value"+strIdx] = "%" + filterKey[1] + "%"
+
 			if idx < len(filters)-1 {
 				whereClause = whereClause + " and "
 			}
@@ -150,6 +151,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 	if whereClause != "" {
 		rows, err = paginator.db.Raw(sql, whereParams).Rows() //Limit in gorm just limits the rows you are taking from the database. It doesn't necessary add "Limit" to your SQL query probably, because if you iterate the rows with rows.Next(), rows that are outside of the limit is still accessed.
 	}
+
+	fmt.Println(sql)
+	fmt.Println(whereParams)
 
 	defer rows.Close()
 

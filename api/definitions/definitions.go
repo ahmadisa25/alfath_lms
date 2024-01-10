@@ -39,11 +39,11 @@ type GenericMongoCreationMessage struct {
 type StringSlice []string
 
 type PaginationParam struct {
-	Sql                string
-	SearchFields       map[string]string
-	SelectFields       StringSlice
-	FilterFields       map[string]string
-	StaticFilterFields map[string]bool
+	Sql              string
+	SearchFields     map[string]string
+	SelectFields     StringSlice
+	FilterFields     map[string]string
+	NullFilterFields map[string]bool
 }
 
 type PaginationRequest struct {
