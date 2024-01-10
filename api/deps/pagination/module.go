@@ -86,6 +86,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 			}
 
 			strIdx := strconv.Itoa(idx)
+			if prm.StaticFilterFields[keyName] {
+				whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") = @filter_value" + strIdx + ""
+			}
 			whereClause = whereClause + " lower(" + prm.FilterFields[keyName] + ") like lower(@filter_value" + strIdx + ")"
 			whereParams["filter_value"+strIdx] = "%" + filterKey[1] + "%"
 			if idx < len(filters)-1 {
@@ -143,6 +146,7 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 	if err != nil {
 		return definitions.PaginationResult{}
 	}
+
 	if whereClause != "" {
 		rows, err = paginator.db.Raw(sql, whereParams).Rows() //Limit in gorm just limits the rows you are taking from the database. It doesn't necessary add "Limit" to your SQL query probably, because if you iterate the rows with rows.Next(), rows that are outside of the limit is still accessed.
 	}

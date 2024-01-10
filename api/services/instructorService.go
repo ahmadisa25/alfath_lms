@@ -34,6 +34,9 @@ func (instructorSvc *InstructorService) GetAllInstructors(req definitions.Pagina
 			"mobile_phone": "foo.mobile_phone",
 			"deleted_at":   "foo.deleted_at",
 		},
+		StaticFilterFields: map[string]bool{
+			"deleted_at": true,
+		},
 	}
 
 	res := instructorSvc.paginator.Paginate(req, paginationParams)
