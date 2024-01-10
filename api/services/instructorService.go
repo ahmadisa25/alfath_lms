@@ -32,6 +32,7 @@ func (instructorSvc *InstructorService) GetAllInstructors(req definitions.Pagina
 			"name":         "foo.name",
 			"email":        "foo.email",
 			"mobile_phone": "foo.mobile_phone",
+			"deleted_at":   "foo.deleted_at",
 		},
 	}
 
