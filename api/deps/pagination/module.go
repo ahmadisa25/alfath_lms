@@ -148,12 +148,9 @@ func (paginator *Paginator) Paginate(req definitions.PaginationRequest, prm defi
 		return definitions.PaginationResult{}
 	}
 
-	if whereClause != "" {
+	if whereClause != "" && len(whereParams) > 0 {
 		rows, err = paginator.db.Raw(sql, whereParams).Rows() //Limit in gorm just limits the rows you are taking from the database. It doesn't necessary add "Limit" to your SQL query probably, because if you iterate the rows with rows.Next(), rows that are outside of the limit is still accessed.
 	}
-
-	fmt.Println(sql)
-	fmt.Println(whereParams)
 
 	defer rows.Close()
 
