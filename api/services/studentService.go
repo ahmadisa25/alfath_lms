@@ -33,6 +33,10 @@ func (studentSvc *StudentService) GetAllStudents(req definitions.PaginationReque
 			"name":         "foo.name",
 			"email":        "foo.email",
 			"mobile_phone": "foo.mobile_phone",
+			"deleted_at":   "foo.deleted_at",
+		},
+		NullFilterFields: map[string]bool{
+			"deleted_at": true,
 		},
 	}
 
@@ -65,16 +69,16 @@ func (studentSvc *StudentService) CreateStudent(student models.Student) (definit
 
 func (studentSvc *StudentService) UpdateStudent(id int, student models.Student, existingStudent models.Student) (definitions.GenericAPIMessage, error) {
 	var studentTemp models.Student
-	studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
+	/*studentSvc.db.Where("Email = ?", student.Email).First(&studentTemp)
 	if studentTemp.Email != "" && existingStudent.Email != student.Email {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Student with that email already exists!",
 		}, nil
-	}
+	}*/
 
 	studentSvc.db.Where("Mobile_Phone = ?", student.MobilePhone).First(&studentTemp)
-	if studentTemp.MobilePhone != "" && existingStudent.MobilePhone == student.MobilePhone {
+	if studentTemp.MobilePhone != "" && existingStudent.Email != student.Email {
 		return definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Student with that mobile phone already exists!",

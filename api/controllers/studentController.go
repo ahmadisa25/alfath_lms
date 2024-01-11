@@ -46,7 +46,7 @@ func (studentController *StudentController) Inject(
 func (studentController *StudentController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -62,169 +62,167 @@ func (studentController *StudentController) Create(ctx context.Context, req *web
 	validateError := studentController.customValidator.Validate.Struct(student)
 	if validateError != nil {
 		errorResponse := funcs.ErrorPackagingForMaps(studentController.customValidator.TranslateError(validateError))
-		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := studentController.studentService.CreateStudent(*student)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 
 func (studentController *StudentController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	student, err := studentController.studentService.GetStudent(intID)
 	if err != nil {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if student.ID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "student Not Found!",
-		})
+		}))
 	}
 
-	return studentController.responder.Data(GetStudentResponse{
+	return funcs.CorsedDataResponse(studentController.responder.Data(GetStudentResponse{
 		Status: 200,
 		Data:   student,
-	})
+	}))
 }
 
 func (studentController *StudentController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	student, err := studentController.studentService.GetStudent(intID)
 	if err != nil {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if student.ID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "student Not Found!",
-		})
+		}))
 	}
 
 	result, err := studentController.studentService.DeleteStudent(intID)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
 	_, deleteUserErr := studentController.userService.Delete(student.Email)
 
 	if deleteUserErr != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(deleteUserErr.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(deleteUserErr.Error())))
 	}
 
-	return studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (studentController *StudentController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	if err != nil {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if intID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an student!",
-		})
+		}))
 	}
 
 	student, err := studentController.studentService.GetStudent(intID)
 	if err != nil {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if student.ID <= 0 {
-		return studentController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(studentController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "student Not Found!",
-		})
+		}))
 	}
 
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -241,9 +239,9 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 		errorResponse := funcs.ErrorPackagingForMaps(studentController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := studentController.studentService.UpdateStudent(intID, *studentData, student)
@@ -251,19 +249,19 @@ func (studentController *StudentController) Update(ctx context.Context, req *web
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
 	studentController.userService.Update(studentData.Email, []bson.E{{"email", studentData.Email}, {"name", studentData.Name}, {"mobilephone", studentData.MobilePhone}})
 
-	return studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (studentController *StudentController) GetAll(ctx context.Context, req *web.Request) web.Result {
@@ -282,17 +280,17 @@ func (studentController *StudentController) GetAll(ctx context.Context, req *web
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return studentController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return studentController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(studentController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return studentController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(studentController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(studentController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 

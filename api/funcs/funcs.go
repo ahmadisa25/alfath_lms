@@ -134,6 +134,11 @@ func CorsedResponse(resp *web.Response) *web.Response {
 	return resp
 }
 
+func CorsedDataResponse(resp *web.DataResponse) *web.DataResponse {
+	resp.Header.Add("Access-Control-Allow-Origin", "*")
+	return resp
+}
+
 func ValidateOrOverwriteStringFormKeys(mapKey string, form map[string][]string, dataType string, input interface{}) interface{} {
 	//used form Flamingo Form Requests (r.Request().Form)
 

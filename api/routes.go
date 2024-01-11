@@ -229,11 +229,19 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	})
 	registry.Route("/student/", "student")
 	registry.HandlePost("student", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.Get, []string{"administrator", "student"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.Create, []string{"administrator", "student"})
+	})
+
+	registry.HandleOptions("student", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
 	})
 
 	registry.Route("/student-all/", "student-all")
 	registry.HandleGet("student-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.studentController.GetAll, []string{"administrator"})
+	})
+
+	registry.HandleOptions("student-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
 	})
 }
