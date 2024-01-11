@@ -8,7 +8,6 @@ import (
 	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -47,20 +46,19 @@ func (courseController *CourseController) GetAll(ctx context.Context, req *web.R
 
 	result, err := courseController.courseService.GetAll(paginationReq)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return courseController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(courseController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 

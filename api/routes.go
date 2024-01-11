@@ -91,6 +91,14 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.courseController.GetAll, nil)
 	})
 
+	registry.HandleOptions("course-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
+	registry.HandleOptions("course", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
 	registry.Route("/course/", "course")
 	registry.HandlePost("course", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.courseController.Create, []string{"administrator", "instructor"})

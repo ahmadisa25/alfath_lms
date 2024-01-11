@@ -24,13 +24,17 @@ func (courseSvc *CourseService) Inject(db *gorm.DB, paginator *pagination.Pagina
 func (courseSvc *CourseService) GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
 	paginationParams := definitions.PaginationParam{
 		Sql:          "Select -select- from (Select * from ms_course) as foo -where-",
-		SelectFields: []string{"name", "description"},
+		SelectFields: []string{"name", "description", "duration"},
 		SearchFields: map[string]string{
 			"name": "foo.name",
 		},
 		FilterFields: map[string]string{
 			"name":        "foo.name",
 			"description": "foo.description",
+			"deleted_at":  "foo.deleted_at",
+		},
+		NullFilterFields: map[string]bool{
+			"deleted_at": true,
 		},
 	}
 
