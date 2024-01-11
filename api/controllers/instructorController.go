@@ -62,7 +62,6 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 	validateError := instructorController.customValidator.Validate.Struct(instructor)
 	if validateError != nil {
 		errorResponse := funcs.ErrorPackagingForMaps(instructorController.customValidator.TranslateError(validateError))
-		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
 			return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(packError.Error())))
@@ -72,7 +71,6 @@ func (instructorController *InstructorController) Create(ctx context.Context, re
 
 	result, err := instructorController.instructorService.CreateInstructor(*instructor)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return funcs.CorsedResponse(instructorController.responder.HTTP(500, strings.NewReader(packError.Error())))
