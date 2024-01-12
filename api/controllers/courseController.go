@@ -244,7 +244,7 @@ func (courseController *CourseController) Delete(ctx context.Context, req *web.R
 func (courseController *CourseController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return courseController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(courseController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -254,9 +254,9 @@ func (courseController *CourseController) Create(ctx context.Context, req *web.R
 	if !instructorsOk {
 		errorResponse, packError := funcs.ErrorPackaging("Please select instructors!", 500)
 		if packError != nil {
-			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	} else {
 		instructorList = instructors[0]
 	}
@@ -275,25 +275,25 @@ func (courseController *CourseController) Create(ctx context.Context, req *web.R
 		errorResponse := funcs.ErrorPackagingForMaps(courseController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return courseController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(courseController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := courseController.courseService.Create(*course, instructorList)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return courseController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return courseController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(courseController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return courseController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(courseController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(courseController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
