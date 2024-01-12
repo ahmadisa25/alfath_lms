@@ -8,8 +8,8 @@ import (
 
 type Instructor struct {
 	gorm.Model
-	ID          int       `gorm:"primaryKey" json:"ID,omitempty"`
-	Name        string    `validate:"required" json:"Name,omitempty"`
+	ID          int       `gorm:"primaryKey,type:bigint" json:"ID,omitempty"`
+	Name        string    `gorm:"type:varchar(200)" validate:"required" json:"Name,omitempty"`
 	Email       string    `gorm:"type:varchar(200)" validate:"required,email" json:"Email,omitempty"`
 	MobilePhone string    `gorm:"type:varchar(30)" validate:"required,numeric" json:"MobilePhone,omitempty"`
 	CreatedAt   time.Time `gorm:"default:NULL" json:"CreatedAt,omitempty"`

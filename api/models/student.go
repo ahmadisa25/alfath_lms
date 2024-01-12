@@ -9,8 +9,8 @@ import (
 type Student struct {
 	gorm.Model
 	ID          int       `gorm:"primaryKey" json:"ID,omitempty"`
-	Name        string    `validate:"required" json:"Name,omitempty"`
-	Email       string    `gorm:"unique" validate:"required,email" json:"Email,omitempty"`
+	Name        string    `gorm:"type:varchar(200)" validate:"required" json:"Name,omitempty"`
+	Email       string    `gorm:"unique,type:varchar(200)" validate:"required,email" json:"Email,omitempty"`
 	MobilePhone string    `gorm:"unique" validate:"required,numeric" json:"MobilePhone,omitempty"`
 	CreatedAt   time.Time `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt   time.Time `json:"UpdatedAt,omitempty"`
