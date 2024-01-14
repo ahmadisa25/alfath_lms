@@ -37,7 +37,7 @@ func (announcementController *AnnouncementController) Inject(
 func (announcementController *AnnouncementController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -56,9 +56,9 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return announcementController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := announcementController.announcementService.Create(*announcement)
@@ -66,17 +66,17 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return announcementController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 
@@ -96,65 +96,65 @@ func (announcementController *AnnouncementController) GetAll(ctx context.Context
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return announcementController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (announcementController *AnnouncementController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return announcementController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an announcement!",
-		})
+		}))
 	}
 
 	result, err := announcementController.announcementService.Delete(req.Params["id"])
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return announcementController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (announcementController *AnnouncementController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return announcementController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an announcement!",
-		})
+		}))
 	}
 
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
 
 	existingAnnouncement, err := announcementController.announcementService.Get(req.Params["id"])
 	if err != nil {
-		return announcementController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	announcement := []bson.E{
@@ -168,15 +168,15 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return announcementController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return announcementController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return announcementController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }

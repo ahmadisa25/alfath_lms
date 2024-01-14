@@ -26,7 +26,7 @@ func (announcementSvc *AnnouncementService) Inject(mongo *mongo.Database, pagina
 }
 
 func (announcementSvc *AnnouncementService) GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
-	mapResult := make(map[int]interface{})
+	var mapResult []models.Announcement
 	filter := bson.M{}
 	if req.Page == "" || req.Page == "0" {
 		req.Page = "1"
@@ -78,7 +78,7 @@ func (announcementSvc *AnnouncementService) GetAll(req definitions.PaginationReq
 	for anouncementCursor.Next(ctx) {
 		var res models.Announcement
 		anouncementCursor.Decode(&res)
-		mapResult[i] = res
+		mapResult = append(mapResult, res)
 		i++
 	}
 
