@@ -221,6 +221,10 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Create, []string{"administrator"})
 	})
 
+	registry.HandleGet("announcement", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.Get, nil)
+	})
+
 	registry.HandleOptions("announcement", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
 	})

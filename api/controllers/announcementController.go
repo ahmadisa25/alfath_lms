@@ -109,6 +109,25 @@ func (announcementController *AnnouncementController) GetAll(ctx context.Context
 	return funcs.CorsedResponse(announcementController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
+func (announcementController *AnnouncementController) Get(ctx context.Context, req *web.Request) web.Result {
+	if req.Params["id"] == "" {
+		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select an instructor!",
+		}))
+	}
+
+	announcement, err := announcementController.announcementService.Get(req.Params["id"])
+	if err != nil {
+		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		}))
+	}
+
+	return funcs.CorsedDataResponse(announcementController.responder.Data(announcement))
+}
+
 func (announcementController *AnnouncementController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
