@@ -8,7 +8,6 @@ import (
 	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -42,10 +41,25 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 
 	form := req.Request().Form
 
+	file, handler, err := req.Request().FormFile("file")
+
+	if err != nil {
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
+	}
+
+	defer file.Close()
+
+	fileDestination := ""
+	if file != nil {
+		if funcs.UploadFile(handler.Filename, file) {
+			fileDestination = handler.Filename
+		}
+	}
+
 	announcement := &models.Announcement{
 		Title:       funcs.ValidateStringFormKeys("Title", form, "string").(string),
 		Description: funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		FileUrl:     funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
+		FileUrl:     fileDestination,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Time{},
 	}
@@ -53,7 +67,6 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 	validateError := announcementController.customValidator.Validate.Struct(announcement)
 	if validateError != nil {
 		errorResponse := funcs.ErrorPackagingForMaps(announcementController.customValidator.TranslateError(validateError))
-		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
 			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
@@ -63,7 +76,6 @@ func (announcementController *AnnouncementController) Create(ctx context.Context
 
 	result, err := announcementController.announcementService.Create(*announcement)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))
@@ -93,7 +105,6 @@ func (announcementController *AnnouncementController) GetAll(ctx context.Context
 
 	result, err := announcementController.announcementService.GetAll(paginationReq)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return funcs.CorsedResponse(announcementController.responder.HTTP(500, strings.NewReader(packError.Error())))

@@ -5,6 +5,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"io"
+	"mime/multipart"
+	"os"
 	"reflect"
 	"strconv"
 
@@ -137,6 +140,29 @@ func CorsedResponse(resp *web.Response) *web.Response {
 func CorsedDataResponse(resp *web.DataResponse) *web.DataResponse {
 	resp.Header.Add("Access-Control-Allow-Origin", "*")
 	return resp
+}
+
+func UploadFile(destination string, file multipart.File) bool {
+	uploadDir := "./uploads"
+
+	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+		os.Mkdir(uploadDir, os.ModePerm) //ModePerm = Permission
+	}
+
+	destPath := uploadDir + "/" + destination
+
+	dst, err := os.Create(destPath)
+	if err != nil {
+		return false
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func ValidateOrOverwriteStringFormKeys(mapKey string, form map[string][]string, dataType string, input interface{}) interface{} {

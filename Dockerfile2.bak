@@ -1,0 +1,11 @@
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY alfath_lms /app
+
+EXPOSE 3322
+
+RUN ls -l /app
+
+CMD ["./alfath_lms", "serve"]
