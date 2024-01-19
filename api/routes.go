@@ -20,6 +20,7 @@ type Routes struct {
 	userController         controllers.UserController
 	announcementController controllers.AnnouncementController
 	optionsHandler         controllers.OptionsHandler
+	uploadHandler          controllers.UploadHandler
 	authMdw                *middleware.AuthMiddleware
 	responder              *web.Responder
 }
@@ -35,11 +36,13 @@ func (routes *Routes) Inject(
 	studentController *controllers.StudentController,
 	userController *controllers.UserController,
 	optionsHandler *controllers.OptionsHandler,
+	uploadHandler *controllers.UploadHandler,
 	announcementController *controllers.AnnouncementController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
 	routes.optionsHandler = *optionsHandler
+	routes.uploadHandler = *uploadHandler
 	routes.quizController = *quizController
 	routes.materialController = *materialController
 	routes.courseController = *courseController
@@ -210,6 +213,15 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/announcement-all/", "announcement-all")
 	registry.HandleGet("announcement-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.announcementController.GetAll, nil)
+	})
+
+	registry.Route("/uploads/:file_name", "upload_dir")
+	registry.HandleGet("upload_dir", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.uploadHandler.Setup(ctx, req)
+	})
+
+	registry.HandleOptions("upload_dir", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
 	})
 
 	registry.HandleOptions("announcement-all", func(ctx context.Context, req *web.Request) web.Result {
