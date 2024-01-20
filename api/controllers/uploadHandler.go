@@ -3,8 +3,7 @@ package controllers
 import (
 	"alfath_lms/api/funcs"
 	"context"
-	"fmt"
-	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,8 +28,6 @@ func (uploadHandler *UploadHandler) Setup(ctx context.Context, req *web.Request)
 		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("Please select a file")))
 	}
 
-	fmt.Println(req.Params["file_name"])
-
 	filePath := "./uploads"
 	filePath = filepath.Join(filePath, req.Params["file_name"])
 	file, err := os.Open(filePath)
@@ -38,15 +35,23 @@ func (uploadHandler *UploadHandler) Setup(ctx context.Context, req *web.Request)
 		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("File doesn't exist")))
 	}
 
-	fileReader := io.Reader(file)
-
 	fileSplit := strings.Split(req.Params["file_name"], ".")
 	fileType := ""
 	if fileSplit[1] == "jpg" || fileSplit[1] == "png" || fileSplit[1] == "jpeg" {
 		fileType = "image/" + fileSplit[1]
 	}
 
-	resp := funcs.CorsedResponse(uploadHandler.responder.Download(fileReader, fileType, req.Params["file_name"], false))
-	//defer file.Close()
+	responseHeader := make(http.Header)
+	responseHeader.Set("Content-Type", fileType)
+	responseHeader.Set("Content-Disposition", "inline")
+
+	resp := &web.Response{
+		Status:         http.StatusOK,
+		Body:           file, //don't need to close the file because if we used Body in http response, the file should be closed automatically
+		Header:         responseHeader,
+		CacheDirective: nil, // You may set cache directives if needed
+	}
+
 	return resp
+
 }
