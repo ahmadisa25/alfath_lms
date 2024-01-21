@@ -126,7 +126,6 @@ func (announcementSvc *AnnouncementService) Get(id string) (definitions.GenericG
 	} else {
 		var existingAnnouncement models.Announcement
 		searchResult.Decode(&existingAnnouncement)
-
 		return definitions.GenericGetMessage[models.Announcement]{
 			Status: 200,
 			Data:   existingAnnouncement,

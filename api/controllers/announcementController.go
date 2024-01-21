@@ -179,6 +179,20 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 
 	form := req.Request().Form
 
+	file, handler, err := req.Request().FormFile("file")
+
+	if err != nil {
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
+	}
+
+	defer file.Close()
+
+	if err != nil {
+		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
+	}
+
+	defer file.Close()
+
 	existingAnnouncement, err := announcementController.announcementService.Get(req.Params["id"])
 	if err != nil {
 		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
@@ -187,10 +201,17 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 		}))
 	}
 
+	fileDestination := existingAnnouncement.Data.FileUrl
+	if file != nil {
+		if funcs.UploadFile(handler.Filename, file) {
+			fileDestination = handler.Filename
+		}
+	}
+
 	announcement := []bson.E{
 		{"title", funcs.ValidateOrOverwriteStringFormKeys("Title", form, "string", existingAnnouncement.Data).(string)},
 		{"description", funcs.ValidateOrOverwriteStringFormKeys("Description", form, "string", existingAnnouncement.Data).(string)},
-		{"fileUrl", funcs.ValidateOrOverwriteStringFormKeys("FileUrl", form, "string", existingAnnouncement.Data).(string)},
+		{"fileurl", fileDestination},
 		{"updatedat", time.Now()},
 	}
 

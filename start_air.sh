@@ -13,6 +13,6 @@ go build -o $APP_NAME
 
 while true; do
     #whoami
-    inotifywait -r -e modify,create,delete,move ./
+    inotifywait -r -e modify,create,delete,move ./api
     restart
 done
