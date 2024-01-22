@@ -12,6 +12,7 @@ type Course struct {
 	Name        string        `validate:"required" json:"Name,omitempty"`
 	Description string        `validate:"required" json:"Description,omitempty"`
 	Duration    int           `validate:"required,numeric" json:"Duration,omitempty"`
+	FileUrl     string        `json:"FileUrl,omitempty"`
 	CreatedAt   time.Time     `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt   time.Time     `json:"UpdatedAt,omitempty"`
 	DeletedAt   time.Time     `gorm:"default:NULL" json:"DeletedAt,omitempty"`

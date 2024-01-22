@@ -187,12 +187,6 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 
 	defer file.Close()
 
-	if err != nil {
-		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
-	}
-
-	defer file.Close()
-
 	existingAnnouncement, err := announcementController.announcementService.Get(req.Params["id"])
 	if err != nil {
 		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
