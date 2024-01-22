@@ -179,14 +179,6 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 
 	form := req.Request().Form
 
-	file, handler, err := req.Request().FormFile("file")
-
-	if err != nil {
-		return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
-	}
-
-	defer file.Close()
-
 	existingAnnouncement, err := announcementController.announcementService.Get(req.Params["id"])
 	if err != nil {
 		return funcs.CorsedDataResponse(announcementController.responder.Data(definitions.GenericAPIMessage{
@@ -196,9 +188,20 @@ func (announcementController *AnnouncementController) Update(ctx context.Context
 	}
 
 	fileDestination := existingAnnouncement.Data.FileUrl
+
+	file, handler, err := req.Request().FormFile("file")
+
 	if file != nil {
-		if funcs.UploadFile(handler.Filename, file) {
-			fileDestination = handler.Filename
+		if err != nil {
+			return funcs.CorsedResponse(announcementController.responder.HTTP(400, strings.NewReader(err.Error())))
+		}
+
+		defer file.Close()
+
+		if file != nil {
+			if funcs.UploadFile(handler.Filename, file) {
+				fileDestination = handler.Filename
+			}
 		}
 	}
 

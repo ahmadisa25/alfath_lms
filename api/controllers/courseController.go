@@ -144,6 +144,24 @@ func (courseController *CourseController) Update(ctx context.Context, req *web.R
 
 	form := req.Request().Form
 
+	fileDestination := course.FileUrl
+
+	file, handler, err := req.Request().FormFile("file")
+
+	if file != nil {
+		if err != nil {
+			return funcs.CorsedResponse(courseController.responder.HTTP(400, strings.NewReader(err.Error())))
+		}
+
+		defer file.Close()
+
+		if file != nil {
+			if funcs.UploadFile(handler.Filename, file) {
+				fileDestination = handler.Filename
+			}
+		}
+	}
+
 	instructorList := ""
 	instructors, instructorsOk := form["Instructors"]
 	if !instructorsOk {
@@ -161,6 +179,7 @@ func (courseController *CourseController) Update(ctx context.Context, req *web.R
 		Description: funcs.ValidateStringFormKeys("Description", form, "string").(string),
 		Duration:    funcs.ValidateStringFormKeys("Duration", form, "int").(int),
 		Instructors: []*models.Instructor{},
+		FileUrl:     fileDestination,
 	}
 
 	//fmt.Printf("validator: %+v\n", courseController.validator.validate)
