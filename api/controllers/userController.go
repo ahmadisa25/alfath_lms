@@ -73,7 +73,7 @@ func (userController *UserController) Refresh(ctx context.Context, req *web.Requ
 func (userController *UserController) Login(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return userController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -86,17 +86,17 @@ func (userController *UserController) Login(ctx context.Context, req *web.Reques
 	if data["Email"] == "" {
 		errorResponse, packError := funcs.ErrorPackaging("Please type in e-mail!", 400)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	if data["Password"] == "" {
 		errorResponse, packError := funcs.ErrorPackaging("Please type in password!", 400)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := userController.userService.Login(data)
@@ -104,23 +104,23 @@ func (userController *UserController) Login(ctx context.Context, req *web.Reques
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return userController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (userController *UserController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return userController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -140,18 +140,18 @@ func (userController *UserController) Create(ctx context.Context, req *web.Reque
 		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	if user.Password != "" {
 		if len(user.Password) < 8 {
 			errorResponse, packError := funcs.ErrorPackaging("Password must have a minimum length of 8 characters!", 400)
 			if packError != nil {
-				return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+				return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 			}
-			return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+			return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(errorResponse)))
 		} else {
 			user.Password = funcs.HashStringToSHA256(user.Password)
 		}
@@ -162,9 +162,9 @@ func (userController *UserController) Create(ctx context.Context, req *web.Reque
 	if role == "" {
 		errorResponse, packError := funcs.ErrorPackaging("Role must be selected!", 400)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := userController.userService.Create(*user, role)
@@ -172,16 +172,16 @@ func (userController *UserController) Create(ctx context.Context, req *web.Reque
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return userController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return userController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(userController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return userController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(userController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(userController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }

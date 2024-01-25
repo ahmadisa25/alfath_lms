@@ -207,6 +207,9 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/login/", "login")
 	registry.HandlePost("login", routes.userController.Login)
 
+	registry.Route("/login/", "login")
+	registry.HandleOptions("login", routes.optionsHandler.Setup)
+
 	registry.Route("/refresh/", "refresh")
 	registry.HandlePost("refresh", routes.userController.Refresh)
 
