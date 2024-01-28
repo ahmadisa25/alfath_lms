@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.3.0
+	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	go.mongodb.org/mongo-driver v1.13.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4

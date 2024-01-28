@@ -1,6 +1,7 @@
 package api
 
 import (
+	"alfath_lms/api/deps/amqp"
 	"alfath_lms/api/deps/db"
 	"alfath_lms/api/deps/mongo"
 	"alfath_lms/api/deps/pagination"
@@ -40,5 +41,6 @@ func (module *Module) Depends() []dingo.Module {
 		new(validator.Module),
 		new(mongo.Module),
 		new(redis.Module),
+		new(amqp.Module),
 	}
 }
