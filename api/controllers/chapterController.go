@@ -40,10 +40,9 @@ func (chapterController *ChapterController) Inject(
 }
 
 func (chapterController *ChapterController) Create(ctx context.Context, req *web.Request) web.Result {
-	fmt.Println("test")
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return chapterController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -63,9 +62,9 @@ func (chapterController *ChapterController) Create(ctx context.Context, req *web
 		fmt.Println(errorResponse)
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return chapterController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return chapterController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := chapterController.chapterService.Create(*chapter)
@@ -73,17 +72,17 @@ func (chapterController *ChapterController) Create(ctx context.Context, req *web
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return chapterController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return chapterController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return chapterController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
 
