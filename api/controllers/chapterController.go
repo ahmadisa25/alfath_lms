@@ -88,133 +88,132 @@ func (chapterController *ChapterController) Create(ctx context.Context, req *web
 
 func (chapterController *ChapterController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an chapter!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a chapter!",
-		})
+		}))
 	}
 
 	chapter, err := chapterController.chapterService.Get(intID)
 	if err != nil {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if chapter.ID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "Chapter Not Found!",
-		})
+		}))
 	}
 
-	return chapterController.responder.Data(GetChapterResponse{
+	return funcs.CorsedDataResponse(chapterController.responder.Data(GetChapterResponse{
 		Status: 200,
 		Data:   chapter,
-	})
+	}))
 }
 
 func (chapterController *ChapterController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an chapter!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an chapter!",
-		})
+		}))
 	}
 
 	chapter, err := chapterController.chapterService.Get(intID)
 	if err != nil {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if chapter.ID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "chapter Not Found!",
-		})
+		}))
 	}
 
 	result, err := chapterController.chapterService.Delete(intID)
 	if err != nil {
-		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return chapterController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return chapterController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return chapterController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (chapterController *ChapterController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an chapter!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	if err != nil {
-		return chapterController.responder.HTTP(500, strings.NewReader(err.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(err.Error())))
 	}
 	//PrintError(err)
 
 	if intID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select an chapter!",
-		})
+		}))
 	}
 
 	chapter, err := chapterController.chapterService.Get(intID)
 	if err != nil {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if chapter.ID <= 0 {
-		return chapterController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(chapterController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "chapter Not Found!",
-		})
+		}))
 	}
 
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return chapterController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -233,24 +232,24 @@ func (chapterController *ChapterController) Update(ctx context.Context, req *web
 		errorResponse := funcs.ErrorPackagingForMaps(chapterController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return chapterController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return chapterController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := chapterController.chapterService.Update(intID, *chapterData)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return chapterController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return chapterController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return chapterController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(chapterController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(chapterController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }

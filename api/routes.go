@@ -124,10 +124,21 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.chapterController.Create, []string{"administrator", "instructor"})
 	})
 
+	registry.Route("/course-chapter/", "course-chapter")
+	registry.HandleOptions("course-chapter", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+
 	registry.Route("/course-chapter/:id", "course-chapter")
 	registry.HandleGet("course-chapter", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.chapterController.Get, nil)
 	})
+
+	registry.Route("/course-chapter/:id", "course-chapter")
+	registry.HandleOptions("course-chapter", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+
 	registry.HandleDelete("course-chapter", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.chapterController.Delete, []string{"administrator", "instructor"})
 	})
