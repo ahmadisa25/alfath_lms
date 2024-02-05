@@ -57,7 +57,7 @@ func (chapterSvc *ChapterService) Get(id int) (models.CourseChapter, error) {
 	var chapter models.CourseChapter
 
 	result := &chapter
-	chapterSvc.db.First(result, "id = ?", id)
+	chapterSvc.db.Preload("Materials").First(result, "id = ?", id)
 
 	return *result, nil
 

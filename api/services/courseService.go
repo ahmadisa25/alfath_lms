@@ -123,7 +123,7 @@ func (courseSvc *CourseService) Get(id int) (models.Course, error) {
 	var course models.Course
 
 	result := &course
-	courseSvc.db.Preload("Instructors").First(result, "id = ?", id)
+	courseSvc.db.Preload("Instructors").Preload("Chapters").First(result, "id = ?", id)
 
 	return *result, nil
 
