@@ -66,7 +66,7 @@ func (materialController *MaterialController) Create(ctx context.Context, req *w
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
 		FileUrl:         fileDestination,
-		CourseChapterID: funcs.ValidateStringFormKeys("CourseID", form, "int").(int),
+		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
 
