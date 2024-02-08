@@ -35,11 +35,15 @@ func (uploadHandler *UploadHandler) Setup(ctx context.Context, req *web.Request)
 		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("File doesn't exist")))
 	}
 
-	fileSplit := strings.Split(req.Params["file_name"], ".")
 	fileType := ""
-	if fileSplit[1] == "jpg" || fileSplit[1] == "png" || fileSplit[1] == "jpeg" {
-		fileType = "image/" + fileSplit[1]
+	buffer := make([]byte, 512)
+	_, err = file.Read(buffer)
+	if err != nil {
+		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("File read error")))
 	}
+
+	// Determine the content type
+	fileType = http.DetectContentType(buffer)
 
 	responseHeader := make(http.Header)
 	responseHeader.Set("Content-Type", fileType)
