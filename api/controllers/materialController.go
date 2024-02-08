@@ -222,7 +222,7 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 	if material.ID <= 0 {
 		return funcs.CorsedDataResponse(materialController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
-			Message: "material Not Found!",
+			Message: "Material Not Found!",
 		}))
 	}
 	formError := req.Request().ParseForm()
