@@ -40,7 +40,6 @@ func (materialController *MaterialController) Inject(
 }
 
 func (materialController *MaterialController) Create(ctx context.Context, req *web.Request) web.Result {
-	fmt.Println("test")
 	formError := req.Request().ParseForm()
 	if formError != nil {
 		return funcs.CorsedResponse(materialController.responder.HTTP(400, strings.NewReader(formError.Error())))
@@ -48,10 +47,25 @@ func (materialController *MaterialController) Create(ctx context.Context, req *w
 
 	form := req.Request().Form
 
+	file, handler, err := req.Request().FormFile("file")
+
+	if err != nil {
+		return funcs.CorsedResponse(materialController.responder.HTTP(400, strings.NewReader(err.Error())))
+	}
+
+	defer file.Close()
+
+	fileDestination := ""
+	if file != nil {
+		if funcs.UploadFile(handler.Filename, file) {
+			fileDestination = handler.Filename
+		}
+	}
+
 	material := &models.ChapterMaterial{
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		FileUrl:         funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
+		FileUrl:         fileDestination,
 		CourseChapterID: funcs.ValidateStringFormKeys("CourseID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
@@ -218,10 +232,28 @@ func (materialController *MaterialController) Update(ctx context.Context, req *w
 
 	form := req.Request().Form
 
+	fileDestination := material.FileUrl
+
+	file, handler, err := req.Request().FormFile("file")
+
+	if file != nil {
+		if err != nil {
+			return funcs.CorsedResponse(materialController.responder.HTTP(400, strings.NewReader(err.Error())))
+		}
+
+		defer file.Close()
+
+		if file != nil {
+			if funcs.UploadFile(handler.Filename, file) {
+				fileDestination = handler.Filename
+			}
+		}
+	}
+
 	materialData := &models.ChapterMaterial{
 		Name:            funcs.ValidateStringFormKeys("Name", form, "string").(string),
 		Description:     funcs.ValidateStringFormKeys("Description", form, "string").(string),
-		FileUrl:         funcs.ValidateStringFormKeys("FileUrl", form, "string").(string),
+		FileUrl:         fileDestination,
 		CourseChapterID: funcs.ValidateStringFormKeys("CourseChapterID", form, "int").(int),
 		CreatedAt:       time.Now(),
 	}
