@@ -18,6 +18,7 @@ type CourseChapter struct {
 	Course      Course             `validate:"omitempty" json:"Course,omitempty"`
 	CourseID    int                `gorm:"foreignKey:CourseID" validate:"required" json:"CourseID,omitempty"`
 	Materials   []*ChapterMaterial `json:"Materials,omitempty"`
+	Quizzes     []*ChapterQuiz     `json:"Quizzes,omitempty"`
 }
 
 // TableName overrides the table name used by User to `profiles`
