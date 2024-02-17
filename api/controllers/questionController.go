@@ -42,82 +42,82 @@ func (questionController *QuestionController) Inject(
 
 func (questionController *QuestionController) Get(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	question, err := questionController.questionService.Get(intID)
 	if err != nil {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if question.ID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "question Not Found!",
-		})
+		}))
 	}
 
-	return questionController.responder.Data(GetQuestionResponse{
+	return funcs.CorsedDataResponse(questionController.responder.Data(GetQuestionResponse{
 		Status: 200,
 		Data:   question,
-	})
+	}))
 }
 
 func (questionController *QuestionController) Update(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	if err != nil {
-		return questionController.responder.HTTP(500, strings.NewReader(err.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(err.Error())))
 	}
 	//PrintError(err)
 
 	if intID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	question, err := questionController.questionService.Get(intID)
 	if err != nil {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if question.ID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "question Not Found!",
-		})
+		}))
 	}
 
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return questionController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -139,10 +139,10 @@ func (questionController *QuestionController) Update(ctx context.Context, req *w
 		}
 
 		if !isTypeExist {
-			return questionController.responder.Data(definitions.GenericAPIMessage{
+			return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 				Status:  400,
 				Message: "Question type doesn't exist!",
-			})
+			}))
 		}
 	}
 
@@ -152,82 +152,82 @@ func (questionController *QuestionController) Update(ctx context.Context, req *w
 		errorResponse := funcs.ErrorPackagingForMaps(questionController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return questionController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return questionController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := questionController.questionService.Update(intID, *questionData)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return questionController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return questionController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return questionController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (questionController *QuestionController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	intID, err := strconv.Atoi(req.Params["id"])
 	//PrintError(err)
 
 	if intID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  400,
 			Message: "Please select a question!",
-		})
+		}))
 	}
 
 	question, err := questionController.questionService.Get(intID)
 	if err != nil {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  500,
 			Message: "We cannot process your request. Please try again or contact support!",
-		})
+		}))
 	}
 
 	if question.ID <= 0 {
-		return questionController.responder.Data(definitions.GenericAPIMessage{
+		return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 			Status:  404,
 			Message: "question Not Found!",
-		})
+		}))
 	}
 
 	result, err := questionController.questionService.Delete(intID)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return questionController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return questionController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return questionController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 }
 
 func (questionController *QuestionController) Create(ctx context.Context, req *web.Request) web.Result {
 	formError := req.Request().ParseForm()
 	if formError != nil {
-		return questionController.responder.HTTP(400, strings.NewReader(formError.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(formError.Error())))
 	}
 
 	form := req.Request().Form
@@ -248,10 +248,10 @@ func (questionController *QuestionController) Create(ctx context.Context, req *w
 			}
 		}
 		if !isTypeExist {
-			return questionController.responder.Data(definitions.GenericAPIMessage{
+			return funcs.CorsedDataResponse(questionController.responder.Data(definitions.GenericAPIMessage{
 				Status:  400,
 				Message: "Question type doesn't exist!",
-			})
+			}))
 		}
 	}
 
@@ -261,25 +261,25 @@ func (questionController *QuestionController) Create(ctx context.Context, req *w
 		errorResponse := funcs.ErrorPackagingForMaps(questionController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
 		if packError != nil {
-			return questionController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return questionController.responder.HTTP(400, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(errorResponse)))
 	}
 
 	result, err := questionController.questionService.Create(*question)
 	if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
-			return questionController.responder.HTTP(500, strings.NewReader(packError.Error()))
+			return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(packError.Error())))
 		}
-		return questionController.responder.HTTP(500, strings.NewReader(errorResponse))
+		return funcs.CorsedResponse(questionController.responder.HTTP(500, strings.NewReader(errorResponse)))
 	}
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {
-		return questionController.responder.HTTP(400, strings.NewReader(resErr.Error()))
+		return funcs.CorsedResponse(questionController.responder.HTTP(400, strings.NewReader(resErr.Error())))
 	}
 
-	return questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res)))
+	return funcs.CorsedResponse(questionController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
 
 }
