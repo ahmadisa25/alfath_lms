@@ -127,6 +127,7 @@ func (questionController *QuestionController) Update(ctx context.Context, req *w
 		ChapterQuizID: funcs.ValidateStringFormKeys("ChapterQuizID", form, "int").(int),
 		Type:          funcs.ValidateStringFormKeys("Type", form, "string").(string),
 		Length:        funcs.ValidateStringFormKeys("Length", form, "int").(int),
+		Choices:       funcs.ValidateStringFormKeys("Choices", form, "string").(string),
 		CreatedAt:     time.Now(),
 	}
 
