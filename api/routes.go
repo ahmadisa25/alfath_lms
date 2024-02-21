@@ -244,6 +244,12 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.userController.Create, []string{"administrator"})
 	})
 
+	registry.Route("/login-admin/", "login-admin")
+	registry.HandlePost("login-admin", routes.userController.LoginAdmin)
+
+	registry.Route("/login-admin/", "login-admin")
+	registry.HandleOptions("login-admin", routes.optionsHandler.Setup)
+
 	registry.Route("/login/", "login")
 	registry.HandlePost("login", routes.userController.Login)
 

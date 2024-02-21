@@ -232,6 +232,107 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 	}
 }
 
+func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions.LoginResponse, error) {
+	filter := bson.D{{"email", Data["Email"].(string)}}
+	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)
+	if searchResult.Err() == mongo.ErrNoDocuments {
+		return definitions.LoginResponse{
+			Status:       400,
+			Message:      "Wrong username or password",
+			Token:        "",
+			RefreshToken: "",
+		}, nil
+	} else if searchResult.Err() != nil {
+		return definitions.LoginResponse{
+			Status:       500,
+			Message:      "there's an error in processing your request. Please try again later",
+			Token:        "",
+			RefreshToken: "",
+		}, nil
+	} else {
+		var existingUser models.User
+		searchResult.Decode(&existingUser)
+		if existingUser.IsDeleted {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      "User doesn't exist",
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		}
+
+		if existingUser.Password != funcs.HashStringToSHA256(Data["Password"].(string)) {
+			return definitions.LoginResponse{
+				Status:       400,
+				Message:      "Wrong username or password",
+				Token:        "",
+				RefreshToken: "",
+			}, nil
+		} else {
+			if existingUser.Role.Name != "admin" {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      "Please sign in with another user!",
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"email":     Data["Email"],
+				"role_name": existingUser.Role.Name,
+				"exp":       time.Now().Add(time.Minute * 60).Unix(),
+			})
+
+			parsedToken, tokenErr := token.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+			if tokenErr != nil {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+
+			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"email":     Data["Email"],
+				"role_name": existingUser.Role.Name,
+				"exp":       time.Now().Add(time.Hour * 24).Unix(),
+			})
+
+			parsedRefreshToken, tokenErr := refreshToken.SignedString([]byte(os.Getenv("JWT_KEY")))
+
+			if tokenErr != nil {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+
+			redisKey := "refresh_token_" + Data["Email"].(string)
+			err := userSvc.redis.Set(context.Background(), redisKey, parsedRefreshToken, 24*time.Hour).Err()
+
+			if err != nil {
+				return definitions.LoginResponse{
+					Status:       400,
+					Message:      tokenErr.Error(),
+					Token:        "",
+					RefreshToken: "",
+				}, nil
+			}
+
+			return definitions.LoginResponse{
+				Status:       200,
+				Message:      "Login Success",
+				Token:        parsedToken,
+				RefreshToken: parsedRefreshToken,
+			}, nil
+		}
+	}
+}
+
 func (userSvc *UserService) Update(Email string, Updates []bson.E) (definitions.GenericAPIMessage, error) {
 	filter := bson.D{{"email", Email}}
 	searchResult := userSvc.mongo.Collection("users").FindOne(context.TODO(), filter)

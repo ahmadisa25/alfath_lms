@@ -12,5 +12,6 @@ type UserServiceInterface interface {
 	Update(Email string, Updates []bson.E) (definitions.GenericAPIMessage, error)
 	Delete(Email string) (definitions.GenericAPIMessage, error)
 	Login(Data map[string]interface{}) (definitions.LoginResponse, error)
+	LoginAdmin(Data map[string]interface{}) (definitions.LoginResponse, error)
 	Refresh(Data map[string]interface{}) (definitions.LoginResponse, error)
 }
