@@ -269,7 +269,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 				RefreshToken: "",
 			}, nil
 		} else {
-			if existingUser.Role.Name != "admin" {
+			if existingUser.Role.Name != "administrator" {
 				return definitions.LoginResponse{
 					Status:       400,
 					Message:      "Please sign in with another user!",
