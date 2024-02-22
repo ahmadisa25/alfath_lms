@@ -78,6 +78,7 @@ func (userSvc *UserService) Refresh(Data map[string]interface{}) (definitions.Lo
 
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"email":     claims["email"],
+			"name":      claims["name"],
 			"role_name": claims["role_name"],
 			"exp":       time.Now().Add(time.Minute * 60).Unix(),
 		})
@@ -95,6 +96,7 @@ func (userSvc *UserService) Refresh(Data map[string]interface{}) (definitions.Lo
 
 		refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"email":     claims["email"],
+			"name":      claims["name"],
 			"role_name": claims["role_name"],
 			"exp":       time.Now().Add(time.Hour * 24).Unix(),
 		})
@@ -179,6 +181,7 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"email":     Data["Email"],
 				"role_name": existingUser.Role.Name,
+				"name":      existingUser.Name,
 				"exp":       time.Now().Add(time.Minute * 60).Unix(),
 			})
 
@@ -196,6 +199,7 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"email":     Data["Email"],
 				"role_name": existingUser.Role.Name,
+				"name":      existingUser.Name,
 				"exp":       time.Now().Add(time.Hour * 24).Unix(),
 			})
 
@@ -279,6 +283,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 			}
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"email":     Data["Email"],
+				"name":      existingUser.Name,
 				"role_name": existingUser.Role.Name,
 				"exp":       time.Now().Add(time.Minute * 60).Unix(),
 			})
@@ -296,6 +301,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 
 			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 				"email":     Data["Email"],
+				"name":      existingUser.Name,
 				"role_name": existingUser.Role.Name,
 				"exp":       time.Now().Add(time.Hour * 24).Unix(),
 			})
