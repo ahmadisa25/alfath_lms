@@ -7,7 +7,6 @@ import (
 	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -39,8 +38,6 @@ func (stdQuizController *StudentQuizController) Create(ctx context.Context, req 
 	}
 
 	form := req.Request().Form
-
-	fmt.Println(form)
 
 	stdQuiz := &models.StudentQuiz{
 
