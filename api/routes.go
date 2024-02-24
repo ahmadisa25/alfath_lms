@@ -19,6 +19,7 @@ type Routes struct {
 	studentController      controllers.StudentController
 	userController         controllers.UserController
 	announcementController controllers.AnnouncementController
+	studentQuizController  controllers.StudentQuizController
 	optionsHandler         controllers.OptionsHandler
 	uploadHandler          controllers.UploadHandler
 	authMdw                *middleware.AuthMiddleware
@@ -38,6 +39,7 @@ func (routes *Routes) Inject(
 	optionsHandler *controllers.OptionsHandler,
 	uploadHandler *controllers.UploadHandler,
 	announcementController *controllers.AnnouncementController,
+	studentQuizController *controllers.StudentQuizController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
@@ -52,6 +54,7 @@ func (routes *Routes) Inject(
 	routes.questionController = *questionController
 	routes.userController = *userController
 	routes.announcementController = *announcementController
+	routes.studentQuizController = *studentQuizController
 	routes.authMdw = &middleware.AuthMiddleware{
 		Responder: responder,
 	}
@@ -175,6 +178,16 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 	registry.Route("/chapter-quiz/", "chapter-quiz")
 	registry.HandlePost("chapter-quiz", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.quizController.Create, []string{"administrator", "instructor"})
+	})
+
+	registry.Route("/student-quiz/", "student-quiz")
+	registry.HandlePost("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentQuizController.Create, []string{"administrator", "instructor"})
+	})
+
+	registry.Route("/student-quiz/", "student-quiz")
+	registry.HandleOptions("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
 	})
 
 	registry.Route("/chapter-quiz/:id", "chapter-quiz")
