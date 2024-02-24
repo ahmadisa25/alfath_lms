@@ -238,18 +238,23 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/quiz-answer/", "quiz-answer")
 	registry.HandlePost("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Create, []string{"student"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Create, []string{"administrator", "student"})
+	})
+
+	registry.Route("/quiz-answer/", "quiz-answer")
+	registry.HandleOptions("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
 	})
 
 	registry.Route("/quiz-answer/:id", "quiz-answer")
 	registry.HandleGet("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Get, nil)
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Get, nil)
 	})
 	registry.HandleDelete("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Delete, []string{"student"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Delete, []string{"student"})
 	})
 	registry.HandlePut("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
-		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Update, []string{"student"})
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Update, []string{"student"})
 	})
 
 	registry.Route("/user/", "user")

@@ -10,7 +10,6 @@ type QuizAnswer struct {
 	gorm.Model
 	ID             int          `gorm:"primaryKey" json:"ID,omitempty"`
 	Answer         string       `validate:"required" json:"Answer,omitempty"`
-	Grade          int          `json:"Grade,omitempty"`
 	Student        Student      `validate:"omitempty" json:"Student,omitempty"`
 	StudentID      int          `gorm:"foreignKey:StudentID" validate:"required" json:"StudentID,omitempty"`
 	CreatedAt      time.Time    `gorm:"default:NULL" json:"CreatedAt,omitempty"`
