@@ -57,7 +57,7 @@ func (quizSvc *QuizService) Get(id int) (models.ChapterQuiz, error) {
 	var quiz models.ChapterQuiz
 
 	result := &quiz
-	quizSvc.db.Preload("Questions.Answers").First(result, "id = ?", id)
+	quizSvc.db.Preload("Questions").First(result, "id = ?", id)
 
 	return *result, nil
 

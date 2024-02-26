@@ -236,6 +236,11 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Update, []string{"administrator", "instructor"})
 	})
 
+	registry.Route("/quiz-answer-all/", "quiz-answer-all")
+	registry.HandleGet("quiz-answer-all", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.GetAll, nil)
+	})
+
 	registry.Route("/quiz-answer/", "quiz-answer")
 	registry.HandlePost("quiz-answer", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Create, []string{"administrator", "student"})
