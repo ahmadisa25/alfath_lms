@@ -20,7 +20,7 @@ func (answerSvc *AnswerService) Inject(db *gorm.DB, paginator *pagination.Pagina
 
 func (answerSvc *AnswerService) GetAll(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
 	paginationParams := definitions.PaginationParam{
-		Sql:          "with answers as (select ma.*, ms.name, ms.email, ms.mobile_phone, mc.id as quiz_id from ms_quiz_questions mq inner join ms_quiz_answers ma on ma.quiz_question_id = mq.id inner join ms_chapter_quiz mc on mq.chapter_quiz_id = mc.id inner join ms_student ms on ma.student_id = ms.id) select -select- from answers -where- order by answers.student_id",
+		Sql:          "with answers as (select ma.*, ms.name, ms.email, ms.mobile_phone, mc.id as quiz_id, mq.title from ms_quiz_questions mq inner join ms_quiz_answers ma on ma.quiz_question_id = mq.id inner join ms_chapter_quiz mc on mq.chapter_quiz_id = mc.id inner join ms_student ms on ma.student_id = ms.id) select -select- from answers -where- order by answers.student_id",
 		SelectFields: []string{"answer", "name", "email", "mobile_phone"},
 		SearchFields: map[string]string{},
 		FilterFields: map[string]string{
@@ -29,7 +29,7 @@ func (answerSvc *AnswerService) GetAll(req definitions.PaginationRequest) (defin
 			"mobile_phone":     "answers.mobile_phone",
 			"quiz_id":          "answers.quiz_id",
 			"quiz_question_id": "answers.quiz_question_id",
-			"deleted_at":       "foo.deleted_at",
+			"student_id":       "answers.student_id",
 		},
 		NullFilterFields: map[string]bool{
 			"deleted_at": true,
