@@ -39,13 +39,21 @@ func (stdQuizController *StudentQuizController) Create(ctx context.Context, req 
 
 	form := req.Request().Form
 
+	GradedByID := funcs.ValidateStringFormKeys("GradedByID", form, "string").(string)
+	var GradedAt time.Time
+	if GradedByID != "" {
+		GradedAt = time.Now()
+	} else {
+		GradedAt = time.Time{}
+	}
+
 	stdQuiz := &models.StudentQuiz{
 
 		StudentID:  funcs.ValidateStringFormKeys("StudentID", form, "int").(int),
 		QuizID:     funcs.ValidateStringFormKeys("QuizID", form, "int").(int),
 		FinalGrade: funcs.ValidateStringFormKeys("FinalGrade", form, "int").(int),
-		GradedByID: funcs.ValidateStringFormKeys("GradedByID", form, "int").(int),
-		GradedAt:   time.Now(),
+		GradedByID: GradedByID,
+		GradedAt:   GradedAt,
 		CreatedAt:  time.Now(),
 	}
 

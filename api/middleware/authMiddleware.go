@@ -49,6 +49,7 @@ func (authMdw *AuthMiddleware) AuthCheck(ctx context.Context, req *web.Request, 
 				}
 
 			}
+			req.Request().Header.Add("id", claims["id"].(string))
 			req.Request().Header.Add("email", claims["email"].(string))
 			req.Request().Header.Add("role_name", claimRole)
 		}

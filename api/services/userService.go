@@ -179,6 +179,7 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			}, nil
 		} else {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"id":        existingUser.ID,
 				"email":     Data["Email"],
 				"role_name": existingUser.Role.Name,
 				"name":      existingUser.Name,
@@ -197,6 +198,7 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 			}
 
 			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"id":        existingUser.ID,
 				"email":     Data["Email"],
 				"role_name": existingUser.Role.Name,
 				"name":      existingUser.Name,
@@ -273,7 +275,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 				RefreshToken: "",
 			}, nil
 		} else {
-			if existingUser.Role.Name != "administrator" {
+			if existingUser.Role.Name != "administrator" || existingUser.Role.Name != "instructor" {
 				return definitions.LoginResponse{
 					Status:       400,
 					Message:      "Please sign in with another user!",
@@ -282,6 +284,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 				}, nil
 			}
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"id":        existingUser.ID,
 				"email":     Data["Email"],
 				"name":      existingUser.Name,
 				"role_name": existingUser.Role.Name,
@@ -300,6 +303,7 @@ func (userSvc *UserService) LoginAdmin(Data map[string]interface{}) (definitions
 			}
 
 			refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"id":        existingUser.ID,
 				"email":     Data["Email"],
 				"name":      existingUser.Name,
 				"role_name": existingUser.Role.Name,

@@ -15,7 +15,7 @@ type StudentQuiz struct {
 	QuizID     int `gorm:"foreignKey:QuizID" validate:"required" json:"QuizID,omitempty"`
 	FinalGrade int `json:"FinalGrade,omitempty" validate:"required"`
 	//GradedBy   Instructor ` json:"GradedBy,omitempty"`
-	GradedByID int       `validate:"required" json:"GradedByID,omitempty"` //Instructor
+	GradedByID string    `gorm:"type:varchar(200)" validate:"required" json:"GradedByID,omitempty"` //Instructor
 	GradedAt   time.Time `gorm:"default:NULL" json:"GradedAt,omitempty" validate:"required"`
 	CreatedAt  time.Time `gorm:"default:NULL" json:"CreatedAt,omitempty"`
 	UpdatedAt  time.Time `json:"UpdatedAt,omitempty"`
