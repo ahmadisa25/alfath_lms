@@ -236,6 +236,16 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.questionController.Update, []string{"administrator", "instructor"})
 	})
 
+	registry.Route("/quiz-answer-all-distinct/", "quiz-answer-all-distinct")
+	registry.HandleGet("quiz-answer-all-distinct", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.GetAllDistinct, []string{"administrator", "instructor"})
+	})
+
+	registry.Route("/quiz-answer-all-distinct/", "quiz-answer-all-distinct")
+	registry.HandleOptions("quiz-answer-all-distinct", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
 	registry.Route("/quiz-answer-all/", "quiz-answer-all")
 	registry.HandleGet("quiz-answer-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.GetAll, []string{"administrator", "instructor"})

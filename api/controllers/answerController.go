@@ -186,6 +186,36 @@ func (answerController *AnswerController) GetAll(ctx context.Context, req *web.R
 
 }
 
+func (answerController *AnswerController) GetAllDistinct(ctx context.Context, req *web.Request) web.Result {
+	query := req.QueryAll()
+	paginationReq := definitions.PaginationRequest{
+		SelectedColumns: funcs.ValidateStringFormKeys("select", query, "string").(string),
+		Search:          funcs.ValidateStringFormKeys("search", query, "string").(string),
+		Page:            funcs.ValidateStringFormKeys("page", query, "string").(string),
+		PerPage:         funcs.ValidateStringFormKeys("perpage", query, "string").(string),
+		OrderBy:         funcs.ValidateStringFormKeys("order", query, "string").(string),
+		Filter:          funcs.ValidateStringFormKeys("filter", query, "string").(string),
+	}
+
+	result, err := answerController.answerService.GetAll(paginationReq)
+	if err != nil {
+		fmt.Println(err)
+		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
+		if packError != nil {
+			return funcs.CorsedResponse(answerController.responder.HTTP(500, strings.NewReader(packError.Error())))
+		}
+		return funcs.CorsedResponse(answerController.responder.HTTP(500, strings.NewReader(errorResponse)))
+	}
+
+	res, resErr := json.Marshal(result)
+	if resErr != nil {
+		return funcs.CorsedResponse(answerController.responder.HTTP(400, strings.NewReader(resErr.Error())))
+	}
+
+	return funcs.CorsedResponse(answerController.responder.HTTP(uint(result.Status), strings.NewReader(string(res))))
+
+}
+
 func (answerController *AnswerController) Delete(ctx context.Context, req *web.Request) web.Result {
 	if req.Params["id"] == "" {
 		return answerController.responder.Data(definitions.GenericAPIMessage{

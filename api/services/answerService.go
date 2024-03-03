@@ -40,6 +40,23 @@ func (answerSvc *AnswerService) GetAll(req definitions.PaginationRequest) (defin
 	return res, nil
 }
 
+func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
+	paginationParams := definitions.PaginationParam{
+		Sql:          "select distinct name, email from  ms_quiz_answers ma inner join ms_quiz_questions mq on ma.quiz_question_id = mq.id inner join ms_student ms on ma.student_id = ms.id -where-",
+		SelectFields: []string{"answer", "name", "email", "mobile_phone"},
+		SearchFields: map[string]string{},
+		FilterFields: map[string]string{
+			"chapter_quiz_id": "chapter_quiz_id",
+		},
+		NullFilterFields: map[string]bool{
+			"deleted_at": true,
+		},
+	}
+
+	res := answerSvc.paginator.Paginate(req, paginationParams)
+	return res, nil
+}
+
 func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.GenericCreationMessage, error) {
 	result := answerSvc.db.Create(&answer)
 	if result.Error != nil {
