@@ -197,7 +197,7 @@ func (answerController *AnswerController) GetAllDistinct(ctx context.Context, re
 		Filter:          funcs.ValidateStringFormKeys("filter", query, "string").(string),
 	}
 
-	result, err := answerController.answerService.GetAll(paginationReq)
+	result, err := answerController.answerService.GetAllDistinct(paginationReq)
 	if err != nil {
 		fmt.Println(err)
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
