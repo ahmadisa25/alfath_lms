@@ -180,6 +180,16 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.quizController.Create, []string{"administrator", "instructor"})
 	})
 
+	registry.Route("/student-quiz/:student_id", "student-quiz")
+	registry.HandleGet("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentQuizController.Get, []string{"administrator", "instructor"})
+	})
+
+	registry.Route("/student-quiz/:id", "student-quiz")
+	registry.HandleOptions("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+
 	registry.Route("/student-quiz/", "student-quiz")
 	registry.HandlePost("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.studentQuizController.Create, []string{"administrator", "instructor"})

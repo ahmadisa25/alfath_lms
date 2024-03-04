@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/validator"
 	"alfath_lms/api/funcs"
 	"alfath_lms/api/interfaces"
 	"alfath_lms/api/models"
 	"context"
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,6 +31,45 @@ func (stdQuizController *StudentQuizController) Inject(
 	stdQuizController.responder = responder
 	stdQuizController.customValidator = customValidator
 	stdQuizController.stdQuizService = studentQuizService
+}
+
+func (stdQuizController *StudentQuizController) Get(ctx context.Context, req *web.Request) web.Result {
+	if req.Params["student_id"] == "" {
+		return funcs.CorsedDataResponse(stdQuizController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select a student!",
+		}))
+	}
+
+	intID, err := strconv.Atoi(req.Params["student_id"])
+	//PrintError(err)
+
+	if intID <= 0 {
+		return funcs.CorsedDataResponse(stdQuizController.responder.Data(definitions.GenericAPIMessage{
+			Status:  400,
+			Message: "Please select a student!",
+		}))
+	}
+
+	answer, err := stdQuizController.stdQuizService.Get(intID)
+	if err != nil {
+		return funcs.CorsedDataResponse(stdQuizController.responder.Data(definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "We cannot process your request. Please try again or contact support!",
+		}))
+	}
+
+	if answer.ID <= 0 {
+		return funcs.CorsedDataResponse(stdQuizController.responder.Data(definitions.GenericAPIMessage{
+			Status:  404,
+			Message: "Quiz Data Not Found!",
+		}))
+	}
+
+	return funcs.CorsedDataResponse(stdQuizController.responder.Data(definitions.GenericGetMessage[models.StudentQuiz]{
+		Status: 200,
+		Data:   answer,
+	}))
 }
 
 func (stdQuizController *StudentQuizController) Create(ctx context.Context, req *web.Request) web.Result {

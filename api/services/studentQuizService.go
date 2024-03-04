@@ -28,3 +28,13 @@ func (studQuizSvc *StudentQuizService) Create(stdQuiz models.StudentQuiz) (defin
 		InstanceID: stdQuiz.ID,
 	}, nil
 }
+
+func (studQuizSvc *StudentQuizService) Get(studentId int) (models.StudentQuiz, error) {
+	var studQuiz models.StudentQuiz
+
+	result := &studQuiz
+	studQuizSvc.db.First(result, "student_id = ?", studentId)
+
+	return *result, nil
+
+}

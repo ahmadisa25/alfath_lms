@@ -42,7 +42,7 @@ func (answerSvc *AnswerService) GetAll(req definitions.PaginationRequest) (defin
 
 func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest) (definitions.PaginationResult, error) {
 	paginationParams := definitions.PaginationParam{
-		Sql:          "select distinct name, email from ms_quiz_answers ma inner join ms_quiz_questions mq on ma.quiz_question_id = mq.id inner join ms_student ms on ma.student_id = ms.id -where-",
+		Sql:          "select distinct name, email, ms.id as student_id, msq.final_grade from ms_quiz_answers ma inner join ms_quiz_questions mq on ma.quiz_question_id = mq.id inner join ms_student ms on ma.student_id = ms.id left join ms_student_quiz msq on ms.id = msq.student_id -where-",
 		SelectFields: []string{"answer", "name", "email", "mobile_phone"},
 		SearchFields: map[string]string{},
 		FilterFields: map[string]string{

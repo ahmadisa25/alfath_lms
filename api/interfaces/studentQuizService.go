@@ -7,4 +7,5 @@ import (
 
 type StudentQuizServiceInterface interface {
 	Create(stdQuiz models.StudentQuiz) (definitions.GenericCreationMessage, error)
+	Get(studentId int) (models.StudentQuiz, error)
 }
