@@ -9,21 +9,22 @@ import (
 )
 
 type Routes struct {
-	questionController     controllers.QuestionController
-	quizController         controllers.QuizController
-	answerController       controllers.AnswerController
-	materialController     controllers.MaterialController
-	chapterController      controllers.ChapterController
-	courseController       controllers.CourseController
-	instructorController   controllers.InstructorController
-	studentController      controllers.StudentController
-	userController         controllers.UserController
-	announcementController controllers.AnnouncementController
-	studentQuizController  controllers.StudentQuizController
-	optionsHandler         controllers.OptionsHandler
-	uploadHandler          controllers.UploadHandler
-	authMdw                *middleware.AuthMiddleware
-	responder              *web.Responder
+	questionController      controllers.QuestionController
+	quizController          controllers.QuizController
+	answerController        controllers.AnswerController
+	materialController      controllers.MaterialController
+	chapterController       controllers.ChapterController
+	courseController        controllers.CourseController
+	instructorController    controllers.InstructorController
+	studentController       controllers.StudentController
+	userController          controllers.UserController
+	announcementController  controllers.AnnouncementController
+	studentQuizController   controllers.StudentQuizController
+	studentCourseController controllers.StudentCourseController
+	optionsHandler          controllers.OptionsHandler
+	uploadHandler           controllers.UploadHandler
+	authMdw                 *middleware.AuthMiddleware
+	responder               *web.Responder
 }
 
 func (routes *Routes) Inject(
@@ -40,6 +41,7 @@ func (routes *Routes) Inject(
 	uploadHandler *controllers.UploadHandler,
 	announcementController *controllers.AnnouncementController,
 	studentQuizController *controllers.StudentQuizController,
+	studentCourseController *controllers.StudentCourseController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
@@ -55,6 +57,7 @@ func (routes *Routes) Inject(
 	routes.userController = *userController
 	routes.announcementController = *announcementController
 	routes.studentQuizController = *studentQuizController
+	routes.studentCourseController = *studentCourseController
 	routes.authMdw = &middleware.AuthMiddleware{
 		Responder: responder,
 	}
@@ -197,6 +200,26 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.Route("/student-quiz/", "student-quiz")
 	registry.HandleOptions("student-quiz", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+
+	registry.Route("/student-course/", "student-course")
+	registry.HandlePost("student-course", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentCourseController.Create, []string{"administrator", "student"})
+	})
+
+	registry.Route("/student-course/", "student-course")
+	registry.HandleOptions("student-course", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+
+	registry.Route("/student-course/:id", "student-course")
+	registry.HandleDelete("student-course", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.studentCourseController.Delete, []string{"administrator", "student"})
+	})
+
+	registry.Route("/student-course/:id", "student-course")
+	registry.HandleOptions("student-course", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
 	})
 

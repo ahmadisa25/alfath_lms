@@ -5,6 +5,7 @@ import (
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/models"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -124,7 +125,7 @@ func (courseSvc *CourseService) Get(id int) (models.Course, error) {
 
 	result := &course
 	courseSvc.db.Preload("Instructors").Preload("Chapters.Materials").Preload("Chapters.Quizzes").First(result, "id = ?", id)
-
+	fmt.Println(result)
 	return *result, nil
 
 }

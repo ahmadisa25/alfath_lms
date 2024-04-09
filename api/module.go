@@ -32,6 +32,7 @@ func (module *Module) Configure(injector *dingo.Injector) {
 	injector.Bind(new(interfaces.QuestionServiceInterface)).To(services.QuestionService{})
 	injector.Bind(new(interfaces.AnnouncementServiceInterface)).To(services.AnnouncementService{})
 	injector.Bind(new(interfaces.StudentQuizServiceInterface)).To(services.StudentQuizService{})
+	injector.Bind(new(interfaces.StudentCourseServiceInterface)).To(services.StudentCourseService{})
 	//}
 }
 

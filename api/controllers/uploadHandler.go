@@ -3,6 +3,7 @@ package controllers
 import (
 	"alfath_lms/api/funcs"
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -28,8 +29,14 @@ func (uploadHandler *UploadHandler) Setup(ctx context.Context, req *web.Request)
 		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("Please select a file")))
 	}
 
+	/*currentDir, err := os.Getwd()
+	if err != nil {
+		return funcs.CorsedResponse(uploadHandler.responder.HTTP(500, strings.NewReader("Internal server error")))
+	}
+	filePath := filepath.Join(currentDir, "../uploads")*/
 	filePath := "./uploads"
 	filePath = filepath.Join(filePath, req.Params["file_name"])
+	fmt.Println(filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
 		return funcs.CorsedResponse(uploadHandler.responder.HTTP(400, strings.NewReader("File doesn't exist")))
@@ -48,6 +55,13 @@ func (uploadHandler *UploadHandler) Setup(ctx context.Context, req *web.Request)
 	responseHeader := make(http.Header)
 	responseHeader.Set("Content-Type", fileType)
 	responseHeader.Set("Content-Disposition", "inline")
+
+	//need to reset the pointer back to the beginning after reading the file.
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		fmt.Println("Error seeking file:", err)
+		return funcs.CorsedResponse(uploadHandler.responder.HTTP(500, strings.NewReader("File seek error")))
+	}
 
 	resp := &web.Response{
 		Status:         http.StatusOK,

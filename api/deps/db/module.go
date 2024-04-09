@@ -31,6 +31,7 @@ func (*Module) Configure(injector *dingo.Injector) {
 			&models.QuizQuestion{},
 			&models.QuizAnswer{},
 			&models.StudentQuiz{},
+			&models.StudentCourse{},
 		)
 
 		return db
