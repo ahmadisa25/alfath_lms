@@ -57,7 +57,7 @@ func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest
 	return res, nil
 }
 
-func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.GenericCreationMessage, error) {
+func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.GenericAPIMessage, error) {
 	count := 0
 	var answerTemp models.QuizAnswer
 	for k, value := range answer.Answer {
