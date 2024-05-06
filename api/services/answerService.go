@@ -58,15 +58,24 @@ func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest
 }
 
 func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.GenericCreationMessage, error) {
-	result := answerSvc.db.Create(&answer)
-	if result.Error != nil {
-		return definitions.GenericCreationMessage{}, result.Error
+	count := 0
+	var answerTemp models.QuizAnswer
+	for k, value := range answer.Answer {
+		answerTemp = models.QuizAnswer{}
+		answerTemp.Answer = string(value)
+		answerTemp.StudentID = answer.StudentID
+		answerTemp.QuizQuestionID = k
+		answerTemp.CreatedAt = answer.CreatedAt
+		result := answerSvc.db.Create(&answer)
+		if result.Error == nil {
+			count++
+		}
 	}
-	return definitions.GenericCreationMessage{
-		Status:     201,
-		InstanceID: answer.ID,
-	}, nil
-}
+
+	return definitions.GenericAPIMessage{
+		Status:  201,
+		Message: "Successfully inserted " + string(count) + " answers",
+	}
 
 func (answerSvc *AnswerService) Update(id int, answer models.QuizAnswer) (definitions.GenericAPIMessage, error) {
 	var answerTemp models.QuizAnswer
