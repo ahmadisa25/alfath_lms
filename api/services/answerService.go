@@ -3,7 +3,9 @@ package services
 import (
 	"alfath_lms/api/definitions"
 	"alfath_lms/api/deps/pagination"
+	"alfath_lms/api/funcs"
 	"alfath_lms/api/models"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -57,14 +59,25 @@ func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest
 	return res, nil
 }
 
-func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.GenericAPIMessage, error) {
+func (answerSvc *AnswerService) Create(answer definitions.SubmittedQuizAnswer) definitions.GenericAPIMessage {
 	count := 0
 	var answerTemp models.QuizAnswer
-	for k, value := range answer.Answer {
+	fmt.Println(funcs.JsonToMap(answer.Answer))
+	for k, value := range funcs.JsonToMap(answer.Answer) {
 		answerTemp = models.QuizAnswer{}
-		answerTemp.Answer = string(value)
+		answerTemp.Answer = value.(string)
 		answerTemp.StudentID = answer.StudentID
-		answerTemp.QuizQuestionID = k
+
+		questionID := funcs.StringToPositiveInt(k)
+
+		if questionID <= 0 {
+			return definitions.GenericAPIMessage{
+				Status:  400,
+				Message: "Question not found!",
+			}
+		}
+
+		answerTemp.QuizQuestionID = questionID
 		answerTemp.CreatedAt = answer.CreatedAt
 		result := answerSvc.db.Create(&answer)
 		if result.Error == nil {
@@ -73,9 +86,10 @@ func (answerSvc *AnswerService) Create(answer models.QuizAnswer) (definitions.Ge
 	}
 
 	return definitions.GenericAPIMessage{
-		Status:  201,
+		Status:  200,
 		Message: "Successfully inserted " + string(count) + " answers",
 	}
+}
 
 func (answerSvc *AnswerService) Update(id int, answer models.QuizAnswer) (definitions.GenericAPIMessage, error) {
 	var answerTemp models.QuizAnswer

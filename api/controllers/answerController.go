@@ -274,11 +274,10 @@ func (answerController *AnswerController) Create(ctx context.Context, req *web.R
 
 	form := req.Request().Form
 
-	answer := &models.QuizAnswer{
-		Answer:         funcs.ValidateStringFormKeys("Answer", form, "string").(string),
-		QuizQuestionID: funcs.ValidateStringFormKeys("QuizQuestionID", form, "int").(int),
-		StudentID:      funcs.ValidateStringFormKeys("StudentID", form, "int").(int),
-		CreatedAt:      time.Now(),
+	answer := &definitions.SubmittedQuizAnswer{
+		Answer:    funcs.ValidateStringFormKeys("Answer", form, "string").(string),
+		StudentID: funcs.ValidateStringFormKeys("StudentID", form, "int").(int),
+		CreatedAt: time.Now(),
 	}
 
 	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
@@ -292,14 +291,14 @@ func (answerController *AnswerController) Create(ctx context.Context, req *web.R
 		return answerController.responder.HTTP(400, strings.NewReader(errorResponse))
 	}
 
-	result, err := answerController.answerService.Create(*answer)
-	if err != nil {
+	result := answerController.answerService.Create(*answer)
+	/*if err != nil {
 		errorResponse, packError := funcs.ErrorPackaging(err.Error(), 500)
 		if packError != nil {
 			return answerController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
 		return answerController.responder.HTTP(500, strings.NewReader(errorResponse))
-	}
+	}*/
 
 	res, resErr := json.Marshal(result)
 	if resErr != nil {

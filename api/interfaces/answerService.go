@@ -10,6 +10,6 @@ type AnswerServiceInterface interface {
 	GetAllDistinct(req definitions.PaginationRequest) (definitions.PaginationResult, error)
 	Get(id int) (models.QuizAnswer, error)
 	Delete(id int) (definitions.GenericAPIMessage, error)
-	Create(answer models.QuizAnswer) (definitions.GenericAPIMessage, error)
+	Create(answer definitions.SubmittedQuizAnswer) definitions.GenericAPIMessage
 	Update(id int, chapter models.QuizAnswer) (definitions.GenericAPIMessage, error)
 }

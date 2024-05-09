@@ -2,6 +2,7 @@ package definitions
 
 import (
 	"context"
+	"time"
 
 	"flamingo.me/flamingo/v3/framework/web"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -62,4 +63,10 @@ type PaginationResult struct {
 	PerPage int
 	Total   int64
 	Status  int
+}
+
+type SubmittedQuizAnswer struct {
+	Answer    string `json:"Answer"`
+	StudentID int
+	CreatedAt time.Time
 }

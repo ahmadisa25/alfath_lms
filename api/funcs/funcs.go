@@ -80,6 +80,26 @@ func HashStringToSHA256(input string) string {
 	}
 }
 
+func StringToPositiveInt(str string) int {
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		return -1
+	} else {
+		return num
+	}
+}
+
+func JsonToMap(obj string) map[string]interface{} {
+	var result map[string]interface{}
+	err := json.Unmarshal([]byte(obj), &result)
+	if err != nil {
+		return result
+	}
+
+	return result
+
+}
+
 func ValidateStringFormKeys(mapKey string, form map[string][]string, dataType string) interface{} {
 	// map[dataType]interface{} means that the map has key of dataTypes and value of any type (yes the interface{} there is a powerful syntax.)
 	//used form Flamingo Form Requests (r.Request().Form) or Queries (r.QueryAll())
