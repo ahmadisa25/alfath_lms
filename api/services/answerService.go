@@ -5,7 +5,6 @@ import (
 	"alfath_lms/api/deps/pagination"
 	"alfath_lms/api/funcs"
 	"alfath_lms/api/models"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -60,9 +59,25 @@ func (answerSvc *AnswerService) GetAllDistinct(req definitions.PaginationRequest
 }
 
 func (answerSvc *AnswerService) Create(answer definitions.SubmittedQuizAnswer) definitions.GenericAPIMessage {
+	/*delResult := answerSvc.db.Where("id = ?", id).Delete(&models.QuizAnswer{})
+	if result.Error != nil {
+		return definitions.GenericAPIMessage{}, result.Error
+	}*/
 	count := 0
+	studentID := answer.StudentID
 	var answerTemp models.QuizAnswer
-	fmt.Println(funcs.JsonToMap(answer.Answer))
+	var questionIDs []int
+	for k, _ := range funcs.JsonToMap(answer.Answer) {
+		questionID := funcs.StringToPositiveInt(k)
+		questionIDs = append(questionIDs, questionID)
+	}
+	err := answerSvc.db.Where("quiz_question_id IN (?) and student_id = ?", questionIDs, studentID).Delete({}models.QuizAnswer).Error
+	if err != nil {
+		return definitions.GenericAPIMessage{
+			Status:  500,
+			Message: "Failed to update answers!",
+		}
+	}
 	for k, value := range funcs.JsonToMap(answer.Answer) {
 		answerTemp = models.QuizAnswer{}
 		answerTemp.Answer = value.(string)
