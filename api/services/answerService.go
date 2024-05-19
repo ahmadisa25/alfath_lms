@@ -79,7 +79,7 @@ func (answerSvc *AnswerService) Create(answer definitions.SubmittedQuizAnswer) d
 
 		answerTemp.QuizQuestionID = questionID
 		answerTemp.CreatedAt = answer.CreatedAt
-		result := answerSvc.db.Create(&answer)
+		result := answerSvc.db.Create(&answerTemp)
 		if result.Error == nil {
 			count++
 		}

@@ -161,6 +161,7 @@ func (userSvc *UserService) Login(Data map[string]interface{}) (definitions.Logi
 	} else {
 		var existingUser models.User
 		searchResult.Decode(&existingUser)
+		fmt.Println(existingUser)
 		if existingUser.IsDeleted {
 			return definitions.LoginResponse{
 				Status:       400,

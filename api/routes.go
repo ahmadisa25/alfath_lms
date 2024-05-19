@@ -21,6 +21,7 @@ type Routes struct {
 	announcementController  controllers.AnnouncementController
 	studentQuizController   controllers.StudentQuizController
 	studentCourseController controllers.StudentCourseController
+	dashboardController     controllers.DashboardController
 	optionsHandler          controllers.OptionsHandler
 	uploadHandler           controllers.UploadHandler
 	authMdw                 *middleware.AuthMiddleware
@@ -42,6 +43,7 @@ func (routes *Routes) Inject(
 	announcementController *controllers.AnnouncementController,
 	studentQuizController *controllers.StudentQuizController,
 	studentCourseController *controllers.StudentCourseController,
+	dashboardController *controllers.DashboardController,
 	responder *web.Responder,
 ) {
 	routes.answerController = *answerController
@@ -58,6 +60,7 @@ func (routes *Routes) Inject(
 	routes.announcementController = *announcementController
 	routes.studentQuizController = *studentQuizController
 	routes.studentCourseController = *studentCourseController
+	routes.dashboardController = *dashboardController
 	routes.authMdw = &middleware.AuthMiddleware{
 		Responder: responder,
 	}
@@ -310,8 +313,8 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 		return routes.authMdw.AuthCheck(ctx, req, routes.answerController.Update, []string{"student"})
 	})
 
-	registry.Route("/user/", "user")
-	registry.HandlePost("user", func(ctx context.Context, req *web.Request) web.Result {
+	registry.Route("/register/", "register")
+	registry.HandlePost("register", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.userController.Create, []string{"administrator"})
 	})
 
@@ -398,5 +401,13 @@ func (routes *Routes) Routes(registry *web.RouterRegistry) {
 
 	registry.HandleOptions("student-all", func(ctx context.Context, req *web.Request) web.Result {
 		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, nil)
+	})
+
+	registry.Route("/dashboard", "dashboard")
+	registry.HandleOptions("dashboard", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.optionsHandler.Setup, []string{})
+	})
+	registry.HandleGet("dashboard", func(ctx context.Context, req *web.Request) web.Result {
+		return routes.authMdw.AuthCheck(ctx, req, routes.dashboardController.GetDashboardData, nil)
 	})
 }

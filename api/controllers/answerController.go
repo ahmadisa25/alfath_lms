@@ -124,7 +124,7 @@ func (answerController *AnswerController) Update(ctx context.Context, req *web.R
 	answerData := &models.QuizAnswer{
 		Answer:         funcs.ValidateStringFormKeys("Answer", form, "string").(string),
 		QuizQuestionID: funcs.ValidateStringFormKeys("QuizQuestion", form, "int").(int),
-		StudentID:      funcs.ValidateStringFormKeys("Student", form, "int").(int),
+		StudentID:      funcs.ValidateStringFormKeys("Student", form, "string").(string),
 		CreatedAt:      time.Now(),
 	}
 
@@ -274,14 +274,16 @@ func (answerController *AnswerController) Create(ctx context.Context, req *web.R
 
 	form := req.Request().Form
 
+	fmt.Println(form)
+
 	answer := &definitions.SubmittedQuizAnswer{
 		Answer:    funcs.ValidateStringFormKeys("Answer", form, "string").(string),
-		StudentID: funcs.ValidateStringFormKeys("StudentID", form, "int").(int),
+		StudentID: funcs.ValidateStringFormKeys("StudentID", form, "string").(string),
 		CreatedAt: time.Now(),
 	}
 
 	//fmt.Printf("validator: %+v\n", instructorController.validator.validate)
-	validateError := answerController.customValidator.Validate.Struct(answer)
+	/*validateError := answerController.customValidator.Validate.Struct(answer)
 	if validateError != nil {
 		errorResponse := funcs.ErrorPackagingForMaps(answerController.customValidator.TranslateError(validateError))
 		errorResponse, packError := funcs.ErrorPackaging(errorResponse, 400)
@@ -289,7 +291,7 @@ func (answerController *AnswerController) Create(ctx context.Context, req *web.R
 			return answerController.responder.HTTP(500, strings.NewReader(packError.Error()))
 		}
 		return answerController.responder.HTTP(400, strings.NewReader(errorResponse))
-	}
+	}*/
 
 	result := answerController.answerService.Create(*answer)
 	/*if err != nil {

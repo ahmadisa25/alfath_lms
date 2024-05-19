@@ -66,7 +66,13 @@ type PaginationResult struct {
 }
 
 type SubmittedQuizAnswer struct {
-	Answer    string `json:"Answer"`
-	StudentID int
+	Answer    string
+	StudentID string
 	CreatedAt time.Time
+}
+
+type SimpleDashboardData struct {
+	TotalCourses     int64
+	TotalStudents    int64
+	TotalSubmissions int64
 }

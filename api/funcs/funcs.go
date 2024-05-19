@@ -6,10 +6,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
+	"math/rand"
 	"mime/multipart"
 	"os"
 	"reflect"
 	"strconv"
+	"time"
 
 	"flamingo.me/flamingo/v3/framework/web"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -78,6 +80,17 @@ func HashStringToSHA256(input string) string {
 		hashSum := hasher.Sum(nil)
 		return hex.EncodeToString(hashSum)
 	}
+}
+
+func RandStringGenerator(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+	var b []rune
+	for i := 0; i < length; i++ {
+		b = append(b, chars[rand.Intn(len(chars))])
+	}
+	password := string(b)
+	return password
 }
 
 func StringToPositiveInt(str string) int {
